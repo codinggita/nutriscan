@@ -8,6 +8,12 @@
 
 ---
 
+## 🚀 Deployed Link
+
+🔗**[Deployed Link](https://nutriscan-jet-three.vercel.app/)**
+
+---
+
 ## 🎨 Design & Prototype
 
 The UI/UX was meticulously crafted to ensure a premium, accessible, and intuitive experience. You can view the original design system and wireframes here:
