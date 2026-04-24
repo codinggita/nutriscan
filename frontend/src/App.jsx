@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { ScanLine, Camera, History, ArrowLeftRight, User } from 'lucide-react';
+import { ScanLine, Camera, History, ArrowLeftRight, User, X } from 'lucide-react';
 import ProductCard from './components/ProductCard';
 import ProfilePage from './components/ProfilePage';
 import HistoryView from './components/HistoryView';
+import CompareView from './components/CompareView';
+import Scanner from './components/Scanner';
 
 // Static Data for the "Landing Page"
 const MOCK_PRODUCTS = [
@@ -48,7 +50,16 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
 function Home() {
   const [activeTab, setActiveTab] = useState('scan');
-  const [sessionId] = useState('demo-session'); // Placeholder for now
+  const [screen, setScreen] = useState('home'); // 'home' or 'scan'
+  const [sessionId] = useState('demo-session');
+  const [ageGroup] = useState('adult');
+
+  const handleScan = (barcode) => {
+    console.log('Scanned:', barcode);
+    setScreen('home');
+    // Here we would typically fetch product and show result
+    alert(`Scanned Barcode: ${barcode}\n(AI analysis pending backend connection)`);
+  };
 
   return (
     <div className="h-[100dvh] w-full bg-white font-sans flex flex-col overflow-hidden">
@@ -76,44 +87,59 @@ function Home() {
           
           {activeTab === 'scan' && (
             <div className="flex flex-col animate-in pb-10">
-              {/* Hero Section */}
-              <div className="relative mb-8 mt-2 md:mt-6 w-full max-w-2xl mx-auto">
-                <div className="relative bg-white rounded-[2.5rem] p-6 md:p-10 text-center border-2 border-gray-900 shadow-[0_6px_0_0_#111827] overflow-hidden flex flex-col items-center">
-                  <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border-4 border-emerald-50 mb-3 md:mb-5">
-                    <ScanLine size={32} className="text-emerald-600" />
+              {screen === 'home' ? (
+                <>
+                  {/* Hero Section */}
+                  <div className="relative mb-8 mt-2 md:mt-6 w-full max-w-2xl mx-auto">
+                    <div className="relative bg-white rounded-[2.5rem] p-6 md:p-10 text-center border-2 border-gray-900 shadow-[0_6px_0_0_#111827] overflow-hidden flex flex-col items-center">
+                      <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border-4 border-emerald-50 mb-3 md:mb-5">
+                        <ScanLine size={32} className="text-emerald-600" />
+                      </div>
+                      <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-2 leading-tight tracking-tight">
+                        Scan to Reveal Risks.
+                      </h2>
+                      <p className="text-gray-500 text-xs md:text-sm font-medium mb-4 max-w-xs mx-auto leading-relaxed">
+                        Point your camera at any food barcode for an instant AI health breakdown.
+                      </p>
+                      <button
+                        onClick={() => setScreen('scan')}
+                        className="w-full max-w-[280px] py-4 bg-emerald-600 text-white rounded-xl font-black text-base uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-transform hover:bg-emerald-700 shadow-lg shadow-emerald-600/20"
+                      >
+                        <Camera size={20} className="text-white" />
+                        <span>Tap to Scan</span>
+                      </button>
+                    </div>
                   </div>
-                  <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-2 leading-tight tracking-tight">
-                    Scan to Reveal Risks.
-                  </h2>
-                  <p className="text-gray-500 text-xs md:text-sm font-medium mb-4 max-w-xs mx-auto leading-relaxed">
-                    Point your camera at any food barcode for an instant AI health breakdown.
-                  </p>
-                  <button
-                    className="w-full max-w-[280px] py-4 bg-emerald-600 text-white rounded-xl font-black text-base uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-transform hover:bg-emerald-700 shadow-lg shadow-emerald-600/20"
-                  >
-                    <Camera size={20} className="text-white" />
-                    <span>Tap to Scan</span>
-                  </button>
-                </div>
-              </div>
 
-              {/* Explore Grid */}
-              <div className="flex items-center justify-between mb-6 px-1">
-                <div>
-                  <h3 className="text-xl font-black text-gray-900 tracking-tight">Explore Snacks</h3>
-                  <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Static Discovery Feed</p>
-                </div>
-              </div>
+                  {/* Explore Grid */}
+                  <div className="flex items-center justify-between mb-6 px-1">
+                    <div>
+                      <h3 className="text-xl font-black text-gray-900 tracking-tight">Explore Snacks</h3>
+                      <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Static Discovery Feed</p>
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                {MOCK_PRODUCTS.map((prod) => (
-                  <ProductCard 
-                    key={prod.barcode} 
-                    product={prod} 
-                    onClick={(barcode) => console.log('Scan:', barcode)} 
-                  />
-                ))}
-              </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    {MOCK_PRODUCTS.map((prod) => (
+                      <ProductCard 
+                        key={prod.barcode} 
+                        product={prod} 
+                        onClick={(barcode) => console.log('Scan:', barcode)} 
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col gap-6 animate-in">
+                  <div className="flex items-center justify-between px-2">
+                    <h2 className="text-2xl font-black text-gray-900 tracking-tighter uppercase">AI Barcode Scanner</h2>
+                    <button onClick={() => setScreen('home')} className="p-2 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 transition-colors">
+                      <X size={20} />
+                    </button>
+                  </div>
+                  <Scanner onScan={handleScan} />
+                </div>
+              )}
             </div>
           )}
 
@@ -128,17 +154,11 @@ function Home() {
           {activeTab === 'profile' && <ProfilePage />}
 
           {activeTab === 'compare' && (
-            <div className="flex flex-col items-center justify-center py-20 text-center animate-in">
-              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                <ArrowLeftRight size={32} className="text-gray-400" />
-              </div>
-              <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight">
-                {activeTab} View
-              </h2>
-              <p className="text-gray-500 text-sm font-medium mt-2">
-                This section is currently under development.
-              </p>
-            </div>
+            <CompareView 
+              sessionId={sessionId} 
+              backendUrl={BACKEND_URL} 
+              ageGroup={ageGroup} 
+            />
           )}
 
         </div>
@@ -152,7 +172,10 @@ function Home() {
             return (
               <button
                 key={id}
-                onClick={() => setActiveTab(id)}
+                onClick={() => {
+                  setActiveTab(id);
+                  if (id === 'scan') setScreen('home');
+                }}
                 className={`flex-1 flex flex-col items-center justify-center py-4 md:py-5 gap-1.5 transition-all relative
                   ${isActive ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600'}`}
               >
