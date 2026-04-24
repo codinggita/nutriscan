@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { ScanLine, Camera, History, ArrowLeftRight, User } from 'lucide-react';
 import ProductCard from './components/ProductCard';
 import ProfilePage from './components/ProfilePage';
+import HistoryView from './components/HistoryView';
 
 // Static Data for the "Landing Page"
 const MOCK_PRODUCTS = [
@@ -43,8 +44,11 @@ const TABS = [
   { id: 'profile', Icon: User,           label: 'Profile' },
 ];
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+
 function Home() {
   const [activeTab, setActiveTab] = useState('scan');
+  const [sessionId] = useState('demo-session'); // Placeholder for now
 
   return (
     <div className="h-[100dvh] w-full bg-white font-sans flex flex-col overflow-hidden">
@@ -113,13 +117,20 @@ function Home() {
             </div>
           )}
 
+          {activeTab === 'history' && (
+            <HistoryView 
+              sessionId={sessionId} 
+              backendUrl={BACKEND_URL} 
+              onProductClick={(barcode) => console.log('View Product:', barcode)} 
+            />
+          )}
+
           {activeTab === 'profile' && <ProfilePage />}
 
-          {(activeTab === 'history' || activeTab === 'compare') && (
+          {activeTab === 'compare' && (
             <div className="flex flex-col items-center justify-center py-20 text-center animate-in">
               <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                {activeTab === 'history' && <History size={32} className="text-gray-400" />}
-                {activeTab === 'compare' && <ArrowLeftRight size={32} className="text-gray-400" />}
+                <ArrowLeftRight size={32} className="text-gray-400" />
               </div>
               <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight">
                 {activeTab} View
