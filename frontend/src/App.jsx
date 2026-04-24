@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { ScanLine, Camera, Search } from 'lucide-react';
+import { ScanLine, Camera, History, ArrowLeftRight, User } from 'lucide-react';
 import ProductCard from './components/ProductCard';
+import ProfilePage from './components/ProfilePage';
 
 // Static Data for the "Landing Page"
 const MOCK_PRODUCTS = [
@@ -35,7 +36,16 @@ const MOCK_PRODUCTS = [
   }
 ];
 
+const TABS = [
+  { id: 'scan',    Icon: ScanLine,       label: 'Scan'    },
+  { id: 'history', Icon: History,        label: 'History' },
+  { id: 'compare', Icon: ArrowLeftRight, label: 'Compare' },
+  { id: 'profile', Icon: User,           label: 'Profile' },
+];
+
 function Home() {
+  const [activeTab, setActiveTab] = useState('scan');
+
   return (
     <div className="h-[100dvh] w-full bg-white font-sans flex flex-col overflow-hidden">
       {/* Header */}
@@ -49,9 +59,9 @@ function Home() {
           </div>
           <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5">
             <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[11px] font-black flex-shrink-0">
-              U
+              H
             </div>
-            <span className="text-gray-700 text-xs font-bold hidden sm:inline">Hi, Guest</span>
+            <span className="text-gray-700 text-xs font-bold hidden sm:inline">Hi, Harshit</span>
           </div>
         </div>
       </header>
@@ -60,49 +70,93 @@ function Home() {
       <main className="flex-1 overflow-y-auto w-full">
         <div className="w-full max-w-7xl mx-auto px-5 md:px-10 pt-5 pb-10">
           
-          {/* Hero Section */}
-          <div className="flex flex-col animate-in pb-10">
-            <div className="relative mb-8 mt-2 md:mt-6 w-full max-w-2xl mx-auto">
-              <div className="relative bg-white rounded-[2.5rem] p-6 md:p-10 text-center border-2 border-gray-900 shadow-[0_6px_0_0_#111827] overflow-hidden flex flex-col items-center">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border-4 border-emerald-50 mb-3 md:mb-5">
-                  <ScanLine size={32} className="text-emerald-600" />
+          {activeTab === 'scan' && (
+            <div className="flex flex-col animate-in pb-10">
+              {/* Hero Section */}
+              <div className="relative mb-8 mt-2 md:mt-6 w-full max-w-2xl mx-auto">
+                <div className="relative bg-white rounded-[2.5rem] p-6 md:p-10 text-center border-2 border-gray-900 shadow-[0_6px_0_0_#111827] overflow-hidden flex flex-col items-center">
+                  <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border-4 border-emerald-50 mb-3 md:mb-5">
+                    <ScanLine size={32} className="text-emerald-600" />
+                  </div>
+                  <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-2 leading-tight tracking-tight">
+                    Scan to Reveal Risks.
+                  </h2>
+                  <p className="text-gray-500 text-xs md:text-sm font-medium mb-4 max-w-xs mx-auto leading-relaxed">
+                    Point your camera at any food barcode for an instant AI health breakdown.
+                  </p>
+                  <button
+                    className="w-full max-w-[280px] py-4 bg-emerald-600 text-white rounded-xl font-black text-base uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-transform hover:bg-emerald-700 shadow-lg shadow-emerald-600/20"
+                  >
+                    <Camera size={20} className="text-white" />
+                    <span>Tap to Scan</span>
+                  </button>
                 </div>
-                <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-2 leading-tight tracking-tight">
-                  Scan to Reveal Risks.
-                </h2>
-                <p className="text-gray-500 text-xs md:text-sm font-medium mb-4 max-w-xs mx-auto leading-relaxed">
-                  Point your camera at any food barcode for an instant AI health breakdown.
-                </p>
-                <button
-                  className="w-full max-w-[280px] py-4 bg-emerald-600 text-white rounded-xl font-black text-base uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-transform hover:bg-emerald-700 shadow-lg shadow-emerald-600/20"
-                >
-                  <Camera size={20} className="text-white" />
-                  <span>Tap to Scan</span>
-                </button>
+              </div>
+
+              {/* Explore Grid */}
+              <div className="flex items-center justify-between mb-6 px-1">
+                <div>
+                  <h3 className="text-xl font-black text-gray-900 tracking-tight">Explore Snacks</h3>
+                  <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Static Discovery Feed</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                {MOCK_PRODUCTS.map((prod) => (
+                  <ProductCard 
+                    key={prod.barcode} 
+                    product={prod} 
+                    onClick={(barcode) => console.log('Scan:', barcode)} 
+                  />
+                ))}
               </div>
             </div>
+          )}
 
-            {/* Explore Grid */}
-            <div className="flex items-center justify-between mb-6 px-1">
-              <div>
-                <h3 className="text-xl font-black text-gray-900 tracking-tight">Explore Snacks</h3>
-                <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Static Discovery Feed</p>
+          {activeTab === 'profile' && <ProfilePage />}
+
+          {(activeTab === 'history' || activeTab === 'compare') && (
+            <div className="flex flex-col items-center justify-center py-20 text-center animate-in">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                {activeTab === 'history' && <History size={32} className="text-gray-400" />}
+                {activeTab === 'compare' && <ArrowLeftRight size={32} className="text-gray-400" />}
               </div>
+              <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight">
+                {activeTab} View
+              </h2>
+              <p className="text-gray-500 text-sm font-medium mt-2">
+                This section is currently under development.
+              </p>
             </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {MOCK_PRODUCTS.map((prod) => (
-                <ProductCard 
-                  key={prod.barcode} 
-                  product={prod} 
-                  onClick={(barcode) => console.log('Scan:', barcode)} 
-                />
-              ))}
-            </div>
-          </div>
+          )}
 
         </div>
       </main>
+
+      {/* Bottom Navigation Bar */}
+      <nav className="shrink-0 w-full bg-white/95 backdrop-blur-xl border-t border-gray-100 z-40 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
+        <div className="flex items-stretch w-full max-w-lg mx-auto">
+          {TABS.map(({ id, Icon, label }) => {
+            const isActive = activeTab === id;
+            return (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={`flex-1 flex flex-col items-center justify-center py-4 md:py-5 gap-1.5 transition-all relative
+                  ${isActive ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600'}`}
+              >
+                {isActive && (
+                  <span className="absolute top-0 left-1/4 right-1/4 h-1 bg-emerald-500 rounded-b-full" />
+                )}
+                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                <span className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'opacity-100' : 'opacity-60'}`}>
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }
