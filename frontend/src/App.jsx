@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { ScanLine, Camera, History, ArrowLeftRight, User, X } from 'lucide-react';
+import { ScanLine, Camera, History, ArrowLeftRight, User, X, LogOut } from 'lucide-react';
 import ProductCard from './components/ProductCard';
 import ProfilePage from './components/ProfilePage';
 import HistoryView from './components/HistoryView';
 import CompareView from './components/CompareView';
 import Scanner from './components/Scanner';
+import LoginPage from './components/LoginPage';
 
 // Static Data for the "Landing Page"
 const MOCK_PRODUCTS = [
@@ -48,16 +49,15 @@ const TABS = [
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
-function Home() {
+function Home({ user, token, onLogout }) {
   const [activeTab, setActiveTab] = useState('scan');
   const [screen, setScreen] = useState('home'); // 'home' or 'scan'
-  const [sessionId] = useState('demo-session');
-  const [ageGroup] = useState('adult');
+  const sessionId = user?.id || 'demo-session';
+  const ageGroup = user?.ageGroup || 'adult';
 
   const handleScan = (barcode) => {
     console.log('Scanned:', barcode);
     setScreen('home');
-    // Here we would typically fetch product and show result
     alert(`Scanned Barcode: ${barcode}\n(AI analysis pending backend connection)`);
   };
 
@@ -72,11 +72,20 @@ function Home() {
             </h1>
             <p className="text-gray-400 text-[10px] font-bold tracking-widest uppercase">POWERED BY GEMINI</p>
           </div>
-          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5">
-            <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[11px] font-black flex-shrink-0">
-              H
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5">
+              <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[11px] font-black flex-shrink-0 uppercase">
+                {user?.name?.[0] || 'U'}
+              </div>
+              <span className="text-gray-700 text-xs font-bold hidden sm:inline">Hi, {user?.name?.split(' ')[0]}</span>
             </div>
-            <span className="text-gray-700 text-xs font-bold hidden sm:inline">Hi, Harshit</span>
+            <button 
+              onClick={onLogout}
+              className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+              title="Logout"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
         </div>
       </header>
@@ -151,7 +160,7 @@ function Home() {
             />
           )}
 
-          {activeTab === 'profile' && <ProfilePage />}
+          {activeTab === 'profile' && <ProfilePage user={user} token={token} />}
 
           {activeTab === 'compare' && (
             <CompareView 
@@ -196,9 +205,35 @@ function Home() {
 }
 
 function App() {
+  const [token, setToken] = useState(localStorage.getItem('sf_token'));
+  const [user, setUser]   = useState(JSON.parse(localStorage.getItem('sf_user')));
+
+  useEffect(() => {
+    // Check if user/token are still valid
+    if (!token) {
+      localStorage.removeItem('sf_token');
+      localStorage.removeItem('sf_user');
+      setUser(null);
+    }
+  }, [token]);
+
+  const handleAuth = (t, u) => {
+    setToken(t);
+    setUser(u);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('sf_token');
+    localStorage.removeItem('sf_user');
+    setToken(null);
+    setUser(null);
+  };
+
+  if (!token) return <LoginPage onAuth={handleAuth} />;
+
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<Home user={user} token={token} onLogout={handleLogout} />} />
     </Routes>
   );
 }
