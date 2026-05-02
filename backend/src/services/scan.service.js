@@ -3,16 +3,16 @@ import Scan from '../models/scan.model.js';
 export const saveScan = async ({ product, risk, nutriScore, ingredientWarnings, sessionId, ageGroup }) => {
   try {
     const scan = new Scan({
-      sessionId:       sessionId || 'anonymous',
-      product_name:    product.name  || 'Unknown Product',
-      brand:           product.brand || '',
-      barcode:         product.barcode || '',
-      nutrition:       product.per100g || {},
-      serving_size_g:  product.serving_size_g || 100,
+      sessionId: sessionId || 'anonymous',
+      product_name: product.name || 'Unknown Product',
+      brand: product.brand || '',
+      barcode: product.barcode || '',
+      nutrition: product.per100g || {},
+      serving_size_g: product.serving_size_g || 100,
       risk,
       nutriScore,
       ingredientWarnings: ingredientWarnings || [],
-      ageGroup:        ageGroup || 'adult',
+      ageGroup: ageGroup || 'adult',
     });
     return await scan.save();
   } catch (err) {
@@ -52,24 +52,24 @@ export const getDailySummary = async (sessionId) => {
     for (const scan of scans) {
       const n = scan.nutrition || {};
       const factor = (scan.serving_size_g || 100) / 100;
-      summary.totalSugar_g        += (n.sugar_g       || 0) * factor;
-      summary.totalFat_g          += (n.fat_g         || 0) * factor;
-      summary.totalSodium_mg      += (n.sodium_mg     || 0) * factor;
-      summary.totalCalories_kcal  += (n.calories_kcal || 0) * factor;
+      summary.totalSugar_g += (n.sugar_g || 0) * factor;
+      summary.totalFat_g += (n.fat_g || 0) * factor;
+      summary.totalSodium_mg += (n.sodium_mg || 0) * factor;
+      summary.totalCalories_kcal += (n.calories_kcal || 0) * factor;
 
       summary.scans.push({
-        name:       scan.product_name,
-        risk:       scan.risk?.level,
+        name: scan.product_name,
+        risk: scan.risk?.level,
         nutriScore: scan.nutriScore?.grade,
-        timestamp:  scan.timestamp,
+        timestamp: scan.timestamp,
       });
     }
 
-    summary.totalSugar_g       = parseFloat(summary.totalSugar_g.toFixed(1));
-    summary.totalFat_g         = parseFloat(summary.totalFat_g.toFixed(1));
-    summary.totalSodium_mg     = parseFloat(summary.totalSodium_mg.toFixed(0));
+    summary.totalSugar_g = parseFloat(summary.totalSugar_g.toFixed(1));
+    summary.totalFat_g = parseFloat(summary.totalFat_g.toFixed(1));
+    summary.totalSodium_mg = parseFloat(summary.totalSodium_mg.toFixed(0));
     summary.totalCalories_kcal = parseFloat(summary.totalCalories_kcal.toFixed(0));
-    summary.sugarTsp           = parseFloat((summary.totalSugar_g / 4).toFixed(1));
+    summary.sugarTsp = parseFloat((summary.totalSugar_g / 4).toFixed(1));
 
     return summary;
   } catch (err) {
@@ -94,13 +94,13 @@ export const getWeeklySummary = async (sessionId) => {
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
-          totalSugar_g: { 
-            $sum: { 
+          totalSugar_g: {
+            $sum: {
               $multiply: [
                 { $ifNull: ["$nutrition.sugar_g", 0] },
                 { $divide: [{ $ifNull: ["$serving_size_g", 100] }, 100] }
-              ] 
-            } 
+              ]
+            }
           }
         }
       },
