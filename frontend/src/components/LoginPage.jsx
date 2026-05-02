@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Salad, User, Baby, PersonStanding, Check, ArrowRight, Sparkles, ScanLine } from 'lucide-react';
 
-const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001') + '/api';
+const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+const BACKEND_URL = baseUrl.replace(/\/+$/, '') + '/api';
 
 // ── BMI helpers ───────────────────────────────────────────────────────────────
 function calcBMI(h, w) {
