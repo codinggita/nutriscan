@@ -21,6 +21,12 @@ app.use('/api/compare', compareRoutes);
 app.use('/api/alternatives', alternativesRoutes);
 app.use('/api/history', historyRoutes);
 
+// Root endpoint
+app.get('/', (req, res) => res.json({ 
+  message: 'NutriScan AI API is running', 
+  docs: '/health' 
+}));
+
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date() }));
 

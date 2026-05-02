@@ -25,7 +25,8 @@ function getOrCreateSessionId() {
 }
 
 const SESSION_ID  = getOrCreateSessionId();
-const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001') + '/api';
+const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+const BACKEND_URL = baseUrl.replace(/\/+$/, '') + '/api';
 
 // ── Tab definitions ───────────────────────────────────────────────────────────
 const TABS = [
