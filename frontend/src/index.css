@@ -3,26 +3,26 @@
 
 @theme {
   --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
-
+  
   --animate-scan: scan 2s ease-in-out infinite;
   --animate-in: fade-in 0.5s ease-out, slide-up 0.5s ease-out;
-
-  --color-brand-green: #22c55e;
+  
+  --color-brand-emerald: #10b981;
   --color-brand-light: #f9fafb;
 
   @keyframes scan {
     0%, 100% { transform: translateY(-80px); opacity: 0.3; }
-    50%       { transform: translateY(80px);  opacity: 0.8; }
+    50% { transform: translateY(80px); opacity: 0.8; }
   }
 
   @keyframes fade-in {
     from { opacity: 0; }
-    to   { opacity: 1; }
+    to { opacity: 1; }
   }
 
   @keyframes slide-up {
     from { transform: translateY(20px); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
+    to { transform: translateY(0); opacity: 1; }
   }
 }
 
@@ -35,13 +35,20 @@
     scroll-behavior: smooth;
   }
 
-  ::-webkit-scrollbar       { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
+  /* Premium Scrollbar for Light Mode */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
   ::-webkit-scrollbar-thumb {
     background: #e5e7eb;
     border-radius: 10px;
   }
-  ::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
+  }
 }
 
 @layer utilities {
@@ -52,15 +59,18 @@
     border: 1px solid rgba(0, 0, 0, 0.05);
   }
 
+  .text-glow-emerald {
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+  }
+
   .animate-in {
     animation: fade-in 0.5s ease-out, slide-up 0.5s ease-out;
   }
 
+  /* Soft elevation for light mode cards */
   .premium-card {
     background: white;
     border: 1px solid #f3f4f6;
-    box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.05),
-      0 2px 4px -2px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
   }
 }
