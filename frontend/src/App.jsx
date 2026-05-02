@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { Helmet } from 'react-helmet';
 import LoginPage          from './components/LoginPage';
 import Scanner             from './components/Scanner';
 import NutritionCard       from './components/NutritionCard';
@@ -236,15 +235,13 @@ function App() {
 
   return (
     <div className="h-[100dvh] w-full bg-white font-sans flex flex-col overflow-hidden">
-      <Helmet>
-        <title>{seo.title}</title>
-        <meta name="description" content={seo.desc} />
-        <meta property="og:title" content={seo.title} />
-        <meta property="og:description" content={seo.desc} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://nutriscan-food.vercel.app/" />
-        <meta property="og:image" content="https://nutriscan-food.vercel.app/logo.png" />
-      </Helmet>
+      <title>{seo.title}</title>
+      <meta name="description" content={seo.desc} />
+      <meta property="og:title" content={seo.title} />
+      <meta property="og:description" content={seo.desc} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="https://nutriscan-food.vercel.app/" />
+      <meta property="og:image" content="https://nutriscan-food.vercel.app/logo.png" />
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <header className="flex items-center justify-between px-5 md:px-10 pt-4 md:pt-5 pb-3 md:pb-4 border-b border-gray-100 flex-shrink-0 bg-white z-10 w-full">
