@@ -20,7 +20,23 @@ ChartJS.register(
   PointElement,
   LineElement,
   Title,
-  Tooltip,  
+  Tooltip,
+  Legend,
+  Filler
+);
+
+export default function WeeklySugarChart({ data }) {
+  if (!data || data.length === 0) return null;
+
+  const labels = data.map(d => {
+    const date = new Date(d.date);
+    return date.toLocaleDateString('en-IN', { weekday: 'short' });
+  });
+
+  const values = data.map(d => d.sugar_g);
+
+  const chartData = {
+    labels,
     datasets: [
       {
         label: 'Sugar Intake (g)',
@@ -45,13 +61,15 @@ ChartJS.register(
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: false },
+      legend: {
+        display: false,
+      },
       tooltip: {
         backgroundColor: '#111827',
         titleFont: { size: 12, weight: 'bold' },
         bodyFont: { size: 14, weight: '900' },
         padding: 12,
-        cornerRadius: 12,Just start speaking. Just starts feetListening. Listening. Where am I? Where am I?What is the current of ASR? Listening. You're in weekly sugar chart dot j s x. Line 54 of 110. Nine errors in this file. I could not generate a fix. Try to Try to change to reject. No pending change to reject. No pending change to reject.  change to reachNo pending change to reject. No pending change to reject. No pending change to reject.No pending change to reject. No pending change to reject. Stop talking. No pending change to reject. Find bugs in this code. I could not generate a PIN. I could not describing the changing change to reject. No pending change to reject. No pending change to reject. No pending
+        cornerRadius: 12,
         displayColors: false,
         callbacks: {
           label: (item) => `${item.raw}g Sugar`,
@@ -61,12 +79,26 @@ ChartJS.register(
     scales: {
       y: {
         beginAtZero: true,
-        grid: { display: true, color: '#f3f4f6', drawBorder: false },
-        ticks: { font: { size: 10, weight: '600' }, color: '#9ca3af', padding: 8 },
+        grid: {
+          display: true,
+          color: '#f3f4f6',
+          drawBorder: false,
+        },
+        ticks: {
+          font: { size: 10, weight: '600' },
+          color: '#9ca3af',
+          padding: 8,
+        },
       },
       x: {
-        grid: { display: false },
-        ticks: { font: { size: 11, weight: '800' }, color: '#4b5563', padding: 8 },
+        grid: {
+          display: false,
+        },
+        ticks: {
+          font: { size: 11, weight: '800' },
+          color: '#4b5563',
+          padding: 8,
+        },
       },
     },
     animation: {
@@ -86,19 +118,25 @@ ChartJS.register(
           Last 7 Days
         </div>
       </div>
-
+      
       <div className="h-[200px] w-full">
         <Bar data={chartData} options={options} />
       </div>
 
       <div className="mt-6 flex items-center justify-between pt-6 border-t border-gray-50">
-        <div className="flex flex-col">
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Avg Daily</span>
-          <span className="text-lg font-black text-gray-900">
-            {(values.reduce((a, b) => a + b, 0) / 7).toFixed(1)}g
-          </spanJIs therIs there any bug in the code? Negative Is there any plug in the code? e on the          {values.reduce((a, b) => a + b, 0).toFixed(0)}g
-          </span>
-        </div>
+         <div className="flex flex-col">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Avg Daily</span>
+            <span className="text-lg font-black text-gray-900">
+              {(values.reduce((a, b) => a + b, 0) / 7).toFixed(1)}g
+            </span>
+         </div>
+         <div className="flex flex-col items-end">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Weekly Total</span>
+            <span className="text-lg font-black text-emerald-600">
+              {values.reduce((a, b) => a + b, 0).toFixed(0)}g
+            </span>
+         </div>
       </div>
     </div>
   );
+}

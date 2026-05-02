@@ -14,14 +14,9 @@ const NUTRIENTS = [
 
 const SAMPLE_PAIRS = [
   {
-    name: 'Classic Chips VS Baked',
-    barcodes: ['8901408000007', '8901058000009'],
-    icon: '🍟'
-  },
-  {
-    name: 'Milk Chocolate VS Dark',
+    name: 'Kurkure Masala Munch vs Maggi 2-Minute Noodles Masala',
     barcodes: ['8901058851335', '8901764000037'],
-    icon: '🍫'
+    icon: '🔥'
   }
 ];
 
@@ -59,9 +54,59 @@ function NutrientRow({ label, unit, v1, v2, winner, isBad }) {
 export default function CompareView({ sessionId, backendUrl, ageGroup }) {
   const [barcode1, setBarcode1] = useState('');
   const [barcode2, setBarcode2] = useState('');
+  const [name1, setName1] = useState('');
+  const [name2, setName2] = useState('');
+  
+  const [searchQuery1, setSearchQuery1] = useState('');
+  const [searchQuery2, setSearchQuery2] = useState('');
+  const [results1, setResults1] = useState([]);
+  const [results2, setResults2] = useState([]);
+  const [searching1, setSearching1] = useState(false);
+  const [searching2, setSearching2] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+
+  const handleSearch = async (q, idx) => {
+    const setQuery = idx === 1 ? setSearchQuery1 : setSearchQuery2;
+    const setResults = idx === 1 ? setResults1 : setResults2;
+    const setSearching = idx === 1 ? setSearching1 : setSearching2;
+
+    setQuery(q);
+    if (q.length < 3) {
+      setResults([]);
+      setSearching(false);
+      return;
+    }
+
+    setSearching(true);
+    try {
+      const res = await fetch(`${backendUrl}/scan/search?q=${encodeURIComponent(q)}`, {
+        headers: { 'x-session-id': sessionId }
+      });
+      const data = await res.json();
+      setResults(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Search failed:', err);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const selectProduct = (prod, idx) => {
+    if (idx === 1) {
+      setBarcode1(prod.barcode);
+      setName1(prod.name);
+      setSearchQuery1(prod.name);
+      setResults1([]);
+    } else {
+      setBarcode2(prod.barcode);
+      setName2(prod.name);
+      setSearchQuery2(prod.name);
+      setResults2([]);
+    }
+  };
 
   const handleCompare = async (e) => {
     if (e) e.preventDefault();
@@ -71,8 +116,8 @@ export default function CompareView({ sessionId, backendUrl, ageGroup }) {
     try {
       const headers = { 'x-session-id': sessionId };
       const [r1, r2] = await Promise.all([
-        fetch(`${backendUrl}/scan?barcode=${barcode1.trim()}`),
-        fetch(`${backendUrl}/scan?barcode=${barcode2.trim()}`),
+        fetch(`${backendUrl}/scan/barcode?barcode=${barcode1.trim()}`, { headers }),
+        fetch(`${backendUrl}/scan/barcode?barcode=${barcode2.trim()}`, { headers }),
       ]);
       const [p1, p2] = await Promise.all([r1.json(), r2.json()]);
 
@@ -94,7 +139,7 @@ export default function CompareView({ sessionId, backendUrl, ageGroup }) {
   };
 
   return (
-    <div className="max-w-6xl mx-auto pb-20 animate-in">
+    <div className="max-w-6xl mx-auto pb-20">
 
       {/* ── HEADER ── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
@@ -112,10 +157,25 @@ export default function CompareView({ sessionId, backendUrl, ageGroup }) {
           {SAMPLE_PAIRS.map((pair, i) => (
             <button
               key={i}
-              onClick={() => { setBarcode1(pair.barcodes[0]); setBarcode2(pair.barcodes[1]); }}
-              className="bg-white border-2 border-gray-900 rounded-xl px-4 py-2.5 text-[11px] font-black uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2"
+              onClick={() => { 
+                setBarcode1(pair.barcodes[0]); 
+                setBarcode2(pair.barcodes[1]);
+                // Set queries to match the pair names for the UI
+                const [n1, n2] = pair.name.split(' vs ');
+                setSearchQuery1(n1);
+                setSearchQuery2(n2);
+              }}
+              className="bg-white border-2 border-gray-900 rounded-xl px-4 py-2.5 text-[11px] font-black uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 group"
             >
-              <span>{pair.icon}</span> {pair.name}
+              <span>{pair.icon}</span> 
+              <span className="flex items-center">
+                {pair.name.split(' vs ').map((part, index) => (
+                  <React.Fragment key={index}>
+                    {part}
+                    {index === 0 && <span className="text-emerald-500 mx-1.5 scale-125 inline-block font-black italic">VS</span>}
+                  </React.Fragment>
+                ))}
+              </span>
             </button>
           ))}
         </div>
@@ -123,24 +183,58 @@ export default function CompareView({ sessionId, backendUrl, ageGroup }) {
 
       {/* ── INPUT SECTION ── */}
       {!result && (
-        <div className="bg-white border-4 border-gray-900 rounded-[2.5rem] p-6 md:p-8 mb-8">
+        <div className="bg-white border-4 border-gray-900 rounded-[2.5rem] p-6 md:p-8 mb-8 animate-in fade-in duration-500">
           <div className="flex flex-col md:flex-row items-center gap-6">
-            {[
-              { value: barcode1, set: setBarcode1, label: 'Product 1' },
-              { value: barcode2, set: setBarcode2, label: 'Product 2' },
-            ].map(({ value, set, label }, idx) => (
-              <React.Fragment key={label}>
-                <div className="flex-1 w-full">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block ml-1">{label}</label>
-                  <div className="relative">
-                    <input
-                      type="text" value={value} onChange={e => set(e.target.value)}
-                      placeholder="Barcode..."
-                      className="w-full pl-11 pr-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-gray-900 outline-none text-sm font-black tracking-widest placeholder-gray-300 transition-all"
-                    />
-                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              {[
+                { value: searchQuery1, results: results1, searching: searching1, label: 'Product 1', idx: 1 },
+                { value: searchQuery2, results: results2, searching: searching2, label: 'Product 2', idx: 2 },
+              ].map(({ value, results, searching, label, idx }) => (
+                <React.Fragment key={label}>
+                  <div className="flex-1 w-full relative">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block ml-1">{label}</label>
+                    <div className="relative group">
+                      <input
+                        type="text" 
+                        value={value} 
+                        onChange={e => handleSearch(e.target.value, idx)}
+                        placeholder="Search product name..."
+                        className="w-full pl-11 pr-10 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-emerald-500 focus:bg-white outline-none text-sm font-bold tracking-tight placeholder-gray-400 transition-all"
+                      />
+                      <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
+                      {searching && (
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                          <div className="w-4 h-4 border-2 border-gray-200 border-t-emerald-500 rounded-full animate-spin" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Results Dropdown */}
+                    {results.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-gray-900 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="max-h-60 overflow-y-auto p-2 custom-scrollbar">
+                          {results.map((res, i) => (
+                            <button 
+                              key={i}
+                              onClick={() => selectProduct(res, idx)}
+                              className="w-full p-2.5 flex items-center gap-3 hover:bg-emerald-50 rounded-xl transition-colors text-left group"
+                            >
+                              <div className="w-10 h-10 rounded-lg bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100">
+                                {res.image_url ? (
+                                  <img src={res.image_url} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-gray-300"><Search size={14}/></div>
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-black text-gray-900 truncate group-hover:text-emerald-700">{res.name}</p>
+                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{res.brand}</p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
                 {idx === 0 && (
                   <div className="hidden md:flex items-center justify-center pt-5">
                     <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-black text-gray-400 border border-gray-200">VS</div>
