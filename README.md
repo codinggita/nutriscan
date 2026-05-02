@@ -8,17 +8,13 @@
 
 ---
 
-## 🚀 Deployed Link
+## 🚀 Live Demo & Design
 
-🔗**[Deployed Link](https://nutriscan-jet-three.vercel.app/)**
-
----
-
-## 🎨 Design & Prototype
-
-The UI/UX was meticulously crafted to ensure a premium, accessible, and intuitive experience. You can view the original design system and wireframes here:
-
-🔗 **[Figma Design Link](https://www.figma.com/design/wFYOlNMilBqg11MpBWax2m/first?node-id=6-12&t=jEuMUfFKnn8rHxBG-1)**
+| Resource | Link |
+| :--- | :--- |
+| **🌐 Frontend Deployment** | [nutriscan-food.vercel.app](https://nutriscan-food.vercel.app/) |
+| **⚙️ Backend API** | [nutriscan-6okf.onrender.com](https://nutriscan-6okf.onrender.com/) |
+| **🎨 Figma Design** | [View Design Prototype](https://www.figma.com/design/wFYOlNMilBqg11MpBWax2m/first?node-id=6-12&t=jEuMUfFKnn8rHxBG-1) |
 
 ---
 
