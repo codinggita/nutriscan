@@ -19,14 +19,14 @@ export default function IngredientWarnings({ warnings }) {
   const visibleItems  = expanded ? sorted : sorted.slice(0, 2);
 
   return (
-    <div className="mb-6 px-1">
+    <div className="mb-6">
       <div className="flex items-center gap-2 mb-4">
         <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-          AI Ingredient Analysis
+          Ingredient Analysis
         </h3>
         {highCount > 0 && (
           <span className="ml-auto text-[9px] bg-rose-500 text-white px-2 py-1 rounded-lg font-black tracking-widest opacity-90">
-            {highCount} CRITICAL WARNINGS
+            {highCount} WARNINGS
           </span>
         )}
       </div>
@@ -36,7 +36,7 @@ export default function IngredientWarnings({ warnings }) {
           const cfg  = RISK_CONFIG[warning.risk] || RISK_CONFIG.MODERATE;
           const { Icon } = cfg;
           return (
-            <div key={idx} className={`rounded-2xl p-4 border ${cfg.border} ${cfg.bg} transition-all shadow-sm`}>
+            <div key={idx} className={`rounded-2xl p-4 border ${cfg.border} ${cfg.bg} transition-all`}>
               <div className="flex items-start gap-4">
                 <div className={`mt-1 p-2 rounded-lg bg-white shadow-sm ${cfg.text}`}>
                   <Icon size={18} />
@@ -58,9 +58,9 @@ export default function IngredientWarnings({ warnings }) {
       {sorted.length > 2 && (
         <button
           onClick={() => setExpanded(e => !e)}
-          className="mt-3 w-full flex items-center justify-center gap-1.5 text-gray-400 text-[10px] font-bold uppercase tracking-widest hover:text-gray-600 transition-colors py-3 bg-white border border-gray-100 rounded-xl shadow-sm active:scale-[0.98]"
+          className="mt-3 w-full flex items-center justify-center gap-1.5 text-gray-400 text-[10px] font-bold uppercase tracking-widest hover:text-gray-600 transition-colors py-2 bg-white border border-gray-100 rounded-xl shadow-sm"
         >
-          {expanded ? <><ChevronUp size={14} /> Collapse List</> : <><ChevronDown size={14} /> See {sorted.length - 2} more insights</>}
+          {expanded ? <><ChevronUp size={14} /> See less items</> : <><ChevronDown size={14} /> View {sorted.length - 2} more warnings</>}
         </button>
       )}
     </div>

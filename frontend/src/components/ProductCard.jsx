@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye } from 'lucide-react';
+import { Eye, ImageOff } from 'lucide-react';
 
 export default function ProductCard({ product, onClick }) {
   const [imgError, setImgError] = useState(false);
@@ -12,7 +12,7 @@ export default function ProductCard({ product, onClick }) {
     >
       <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center">
         {imgError ? (
-          <div className="w-full h-full bg-gray-50/50 flex items-center justify-center text-gray-300 font-bold">No Image</div>
+          <div className="w-full h-full bg-gray-50/50"></div>
         ) : (
           <img 
             src={imageUrl} 

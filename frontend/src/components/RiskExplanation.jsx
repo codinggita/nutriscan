@@ -32,7 +32,7 @@ export default function RiskExplanation({ explanation, signals }) {
           {[...Array(3)].map((_, i) => <div key={i} className="w-1 h-1 rounded-full bg-emerald-500/30" />)}
         </div>
         <div className="text-[9px] font-black text-gray-300 flex items-center gap-1 uppercase tracking-widest">
-          Gemini Intelligence
+          Gemini 2.5 Intelligence
         </div>
       </div>
     </div>
