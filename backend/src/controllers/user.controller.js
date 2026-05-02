@@ -19,7 +19,7 @@ function signToken(user) {
 // ── POST /api/users/register (signup) ─────────────────────────────────────────
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, height, weight, ageGroup, sessionId } = req.body;
+    const { name, email, password, height, weight, ageGroup, conditions, sessionId } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Name, email and password are required.' });
@@ -40,6 +40,7 @@ export const registerUser = async (req, res) => {
       height:   height   ? parseFloat(height)   : null,
       weight:   weight   ? parseFloat(weight)   : null,
       ageGroup: ageGroup || 'adult',
+      conditions: Array.isArray(conditions) ? conditions : [],
       sessionId: sessionId || null,
     });
     await user.save();
@@ -48,7 +49,7 @@ export const registerUser = async (req, res) => {
     return res.status(201).json({ token, user: user.toPublic() });
   } catch (err) {
     console.error('[registerUser]', err);
-    return res.status(500).json({ error: 'Signup failed. Please try again.' });
+    return res.status(500).json({ error: `Signup failed: ${err.message}` });
   }
 };
 
