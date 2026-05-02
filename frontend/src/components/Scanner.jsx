@@ -37,7 +37,7 @@ export default function Scanner({ onScan }) {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-6 animate-in">
+    <div className="w-full max-w-md mx-auto space-y-6">
       <div className="relative aspect-[4/5] bg-gray-200 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col items-center justify-center border-4 border-white ring-1 ring-gray-100">
         <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover grayscale-[0.5]"></video>
         
