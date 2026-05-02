@@ -1,0 +1,58 @@
+{
+  "HIGH": [
+    { "name": "Too Yumm Multigrain Baked Chips",         "per100g": { "sugar_g": 3,   "fat_g": 8,   "sodium_mg": 420,  "calories_kcal": 380, "protein_g": 5,   "fiber_g": 3 } },
+    { "name": "Haldiram's Roasted Almonds",               "per100g": { "sugar_g": 4,   "fat_g": 50,  "sodium_mg": 10,   "calories_kcal": 576, "protein_g": 21,  "fiber_g": 12 } },
+    { "name": "Saffola Oats Plain",                       "per100g": { "sugar_g": 1,   "fat_g": 7,   "sodium_mg": 5,    "calories_kcal": 370, "protein_g": 13,  "fiber_g": 10 } },
+    { "name": "Dark Chocolate 70% Cacao",                 "per100g": { "sugar_g": 24,  "fat_g": 43,  "sodium_mg": 20,   "calories_kcal": 598, "protein_g": 7,   "fiber_g": 11 } },
+    { "name": "Britannia NutriChoice Biscuits",           "per100g": { "sugar_g": 14,  "fat_g": 10,  "sodium_mg": 380,  "calories_kcal": 430, "protein_g": 8,   "fiber_g": 5 } },
+    { "name": "Baked Ragi Cookies",                      "per100g": { "sugar_g": 18,  "fat_g": 12,  "sodium_mg": 200,  "calories_kcal": 420, "protein_g": 7,   "fiber_g": 4 } },
+    { "name": "Amul Sugar-Free Ice Cream",               "per100g": { "sugar_g": 0,   "fat_g": 8,   "sodium_mg": 60,   "calories_kcal": 130, "protein_g": 4,   "fiber_g": 0 } },
+    { "name": "Homemade Tomato Dip (no sugar)",          "per100g": { "sugar_g": 5,   "fat_g": 0.5, "sodium_mg": 200,  "calories_kcal": 40,  "protein_g": 1,   "fiber_g": 2 } }
+  ],
+  "MODERATE": [
+    { "name": "Fox Nuts (Makhana) Roasted",              "per100g": { "sugar_g": 0,   "fat_g": 1,   "sodium_mg": 60,   "calories_kcal": 347, "protein_g": 9,   "fiber_g": 14 } },
+    { "name": "Too Yumm Multigrain Baked Chips",         "per100g": { "sugar_g": 3,   "fat_g": 8,   "sodium_mg": 420,  "calories_kcal": 380, "protein_g": 5,   "fiber_g": 3 } },
+    { "name": "bebe burp Ragi Cookies",                  "per100g": { "sugar_g": 14.4, "fat_g": 16.2, "sodium_mg": 138.7,"calories_kcal": 462.9, "protein_g": 7.1, "fiber_g": 4.3 } },
+    { "name": "Mighty Puffs Choco Ragi",                 "per100g": { "sugar_g": 12,  "fat_g": 15,  "sodium_mg": 250,  "calories_kcal": 410, "protein_g": 8,   "fiber_g": 5 } },
+    { "name": "Bikano Roasted Chana Namkeen",            "per100g": { "sugar_g": 2,   "fat_g": 5,   "sodium_mg": 400,  "calories_kcal": 350, "protein_g": 20,  "fiber_g": 9 } },
+    { "name": "Britannia NutriChoice Digestive",         "per100g": { "sugar_g": 12,  "fat_g": 9,   "sodium_mg": 360,  "calories_kcal": 410, "protein_g": 9,   "fiber_g": 6 } },
+    { "name": "Dark Chocolate 70% Cacao",                "per100g": { "sugar_g": 24,  "fat_g": 43,  "sodium_mg": 20,   "calories_kcal": 598, "protein_g": 7,   "fiber_g": 11 } },
+    { "name": "Amul Sugar-Free Ice Cream",               "per100g": { "sugar_g": 0,   "fat_g": 8,   "sodium_mg": 60,   "calories_kcal": 130, "protein_g": 4,   "fiber_g": 0 } }
+  ],
+  "LOW": [
+    { "name": "Fox Nuts (Makhana) Roasted",              "per100g": { "sugar_g": 0,   "fat_g": 1,   "sodium_mg": 60,   "calories_kcal": 347, "protein_g": 9,   "fiber_g": 14 } },
+    { "name": "Saffola Oats Plain",                      "per100g": { "sugar_g": 1,   "fat_g": 7,   "sodium_mg": 5,    "calories_kcal": 370, "protein_g": 13,  "fiber_g": 10 } },
+    { "name": "bebe burp Ragi Cookies",                  "per100g": { "sugar_g": 14.4, "fat_g": 16.2, "sodium_mg": 138.7,"calories_kcal": 462.9, "protein_g": 7.1, "fiber_g": 4.3 } },
+    { "name": "Britannia NutriChoice Biscuits",          "per100g": { "sugar_g": 14,  "fat_g": 10,  "sodium_mg": 380,  "calories_kcal": 430, "protein_g": 8,   "fiber_g": 5 } }
+  ],
+
+  "_category_hints": {
+    "chocolate": [
+      { "name": "Dark Chocolate 70% Cacao (Lindt)",      "per100g": { "sugar_g": 24,  "fat_g": 43,  "sodium_mg": 20,   "calories_kcal": 598, "protein_g": 7,   "fiber_g": 11 } },
+      { "name": "Amul Dark Chocolate",                    "per100g": { "sugar_g": 28,  "fat_g": 36,  "sodium_mg": 15,   "calories_kcal": 540, "protein_g": 6,   "fiber_g": 8 } },
+      { "name": "Cadbury Bournville Rich Cocoa",          "per100g": { "sugar_g": 36,  "fat_g": 32,  "sodium_mg": 30,   "calories_kcal": 520, "protein_g": 6,   "fiber_g": 5 } }
+    ],
+    "biscuit": [
+      { "name": "Britannia NutriChoice 5-Grain Biscuits","per100g": { "sugar_g": 14,  "fat_g": 10,  "sodium_mg": 380,  "calories_kcal": 430, "protein_g": 8,   "fiber_g": 5 } },
+      { "name": "bebe burp Ragi Cookies",                "per100g": { "sugar_g": 14.4, "fat_g": 16.2, "sodium_mg": 138.7,"calories_kcal": 462.9, "protein_g": 7.1, "fiber_g": 4.3 } },
+      { "name": "Digestive Marie Biscuits",               "per100g": { "sugar_g": 12,  "fat_g": 9,   "sodium_mg": 350,  "calories_kcal": 405, "protein_g": 9,   "fiber_g": 6 } },
+      { "name": "Baked Ragi Cookies",                    "per100g": { "sugar_g": 18,  "fat_g": 12,  "sodium_mg": 200,  "calories_kcal": 420, "protein_g": 7,   "fiber_g": 4 } }
+    ],
+    "chips": [
+      { "name": "Too Yumm Multigrain Baked Chips",        "per100g": { "sugar_g": 3,   "fat_g": 8,   "sodium_mg": 420,  "calories_kcal": 380, "protein_g": 5,   "fiber_g": 3 } },
+      { "name": "Mighty Puffs Choco Ragi",               "per100g": { "sugar_g": 12,  "fat_g": 15,  "sodium_mg": 250,  "calories_kcal": 410, "protein_g": 8,   "fiber_g": 5 } },
+      { "name": "Fox Nuts (Makhana) Roasted",             "per100g": { "sugar_g": 0,   "fat_g": 1,   "sodium_mg": 60,   "calories_kcal": 347, "protein_g": 9,   "fiber_g": 14 } },
+      { "name": "Bikano Roasted Chana Namkeen",           "per100g": { "sugar_g": 2,   "fat_g": 5,   "sodium_mg": 400,  "calories_kcal": 350, "protein_g": 20,  "fiber_g": 9 } }
+    ],
+    "ice_cream": [
+      { "name": "Amul Sugar-Free Vanilla Ice Cream",      "per100g": { "sugar_g": 0,   "fat_g": 8,   "sodium_mg": 60,   "calories_kcal": 130, "protein_g": 4,   "fiber_g": 0 } },
+      { "name": "Frozen Banana Nice Cream",               "per100g": { "sugar_g": 12,  "fat_g": 0.3, "sodium_mg": 1,    "calories_kcal": 89,  "protein_g": 1.1, "fiber_g": 2.6 } },
+      { "name": "Greek Yogurt with Berries",              "per100g": { "sugar_g": 6,   "fat_g": 3,   "sodium_mg": 36,   "calories_kcal": 100, "protein_g": 10,  "fiber_g": 0 } }
+    ],
+    "ketchup": [
+      { "name": "Homemade Tomato Dip (no added sugar)",  "per100g": { "sugar_g": 4,   "fat_g": 0.5, "sodium_mg": 200,  "calories_kcal": 38,  "protein_g": 1,   "fiber_g": 2 } },
+      { "name": "Dr Oetker Mustard Sauce",               "per100g": { "sugar_g": 3,   "fat_g": 3,   "sodium_mg": 900,  "calories_kcal": 100, "protein_g": 3,   "fiber_g": 1 } },
+      { "name": "Heinz No-Added-Sugar Ketchup",          "per100g": { "sugar_g": 1.9, "fat_g": 0.1, "sodium_mg": 570,  "calories_kcal": 34,  "protein_g": 1.2, "fiber_g": 1 } }
+    ]
+  }
+}
