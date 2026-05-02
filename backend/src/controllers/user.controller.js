@@ -19,7 +19,7 @@ function signToken(user) {
 // ── POST /api/users/register (signup) ─────────────────────────────────────────
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, height, weight, ageGroup } = req.body;
+    const { name, email, password, height, weight, ageGroup, sessionId } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Name, email and password are required.' });
@@ -40,6 +40,7 @@ export const registerUser = async (req, res) => {
       height:   height   ? parseFloat(height)   : null,
       weight:   weight   ? parseFloat(weight)   : null,
       ageGroup: ageGroup || 'adult',
+      sessionId: sessionId || null,
     });
     await user.save();
 
@@ -92,10 +93,13 @@ export const getUserProfile = async (req, res) => {
 // ── PATCH /api/users/profile (update) ─────────────────────────────────────────
 export const updateUserProfile = async (req, res) => {
   try {
-    const { height, weight, conditions, ageGroup, autoFlagHighSugar } = req.body;
-
+    const { name, password, height, weight, conditions, ageGroup, autoFlagHighSugar } = req.body;
+    
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ error: 'User not found.' });
+
+    if (name) user.name = name.trim();
+    if (password && password.length >= 6) user.password = password;
 
     if (height !== undefined)     user.height = height ? parseFloat(height) : null;
     if (weight !== undefined)     user.weight = weight ? parseFloat(weight) : null;

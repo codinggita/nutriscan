@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Salad, User, Baby, PersonStanding, Check, ArrowRight, Sparkles, ScanLine } from 'lucide-react';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001') + '/api';
 
 // ── BMI helpers ───────────────────────────────────────────────────────────────
 function calcBMI(h, w) {
@@ -61,7 +61,7 @@ export default function LoginPage({ onAuth }) {
     e.preventDefault();
     setError(''); setSuccess(''); setLoading(true);
 
-    const endpoint = mode === 'login' ? '/api/users/login' : '/api/users/register';
+    const endpoint = mode === 'login' ? '/user/login' : '/user/register';
     const body     = mode === 'login'
       ? { email, password }
       : { name, email, password, height: height || null, weight: weight || null, ageGroup };
@@ -118,7 +118,7 @@ export default function LoginPage({ onAuth }) {
           pointer-events: none;
         }
 
-        /* ── Soft emerald glow blob ── */
+        /* ── Soft emerald glow blob (top-left) ── */
         .lp-blob {
           position: absolute;
           width: 520px; height: 520px;
@@ -139,7 +139,7 @@ export default function LoginPage({ onAuth }) {
           50%       { transform: translate(24px, -28px) scale(1.04); }
         }
 
-        /* ── Card ── */
+        /* ── Card — matches app hero style ── */
         .lp-card {
           position: relative;
           z-index: 10;
@@ -155,6 +155,9 @@ export default function LoginPage({ onAuth }) {
         @keyframes cardIn {
           from { opacity: 0; transform: translateY(24px) scale(0.97); }
           to   { opacity: 1; transform: translateY(0)    scale(1); }
+        }
+        @media (max-width: 480px) {
+          .lp-card { padding: 28px 20px 24px; border-radius: 1.25rem; }
         }
 
         /* ── Logo ── */
@@ -173,6 +176,10 @@ export default function LoginPage({ onAuth }) {
           font-size: 20px; font-weight: 800; color: #111827; letter-spacing: -0.5px; line-height: 1;
         }
         .lp-logo-name span { color: #10b981; }
+        .lp-logo-powered {
+          font-size: 10px; font-weight: 700; color: #9ca3af;
+          letter-spacing: 2.5px; text-transform: uppercase; margin-top: 2px;
+        }
 
         /* ── Mode toggle ── */
         .lp-toggle {
@@ -215,6 +222,7 @@ export default function LoginPage({ onAuth }) {
           font-size: 11px; font-weight: 700; color: #374151;
           letter-spacing: 0.8px; text-transform: uppercase;
         }
+        .lp-optional { color: #9ca3af; font-weight: 500; text-transform: none; letter-spacing: 0; }
         .lp-input {
           width: 100%; padding: 11px 13px;
           background: #f9fafb;
@@ -222,99 +230,246 @@ export default function LoginPage({ onAuth }) {
           border-radius: 8px;
           color: #111827;
           font-size: 14px; font-family: inherit;
+          transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
           outline: none;
         }
+        .lp-input::placeholder { color: #d1d5db; }
         .lp-input:focus {
           border-color: #10b981;
           background: #ffffff;
           box-shadow: 0 0 0 3px rgba(16,185,129,0.12);
         }
 
+        /* ── Two-column row ── */
         .lp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-        .lp-bmi-card {
-          border-radius: 8px; padding: 11px 14px;
-          display: flex; align-items: center; justify-content: space-between;
-          border: 1.5px solid #e5e7eb; background: #f9fafb;
+        /* ── Divider ── */
+        .lp-divider {
+          display: flex; align-items: center; gap: 10px; margin: 2px 0;
         }
-        .lp-bmi-label { font-size: 10px; color: #9ca3af; font-weight: 700; text-transform: uppercase; }
-        .lp-bmi-value { font-size: 20px; font-weight: 800; line-height: 1; }
-        .lp-bmi-pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px; }
+        .lp-divider-line { flex: 1; height: 1px; background: #f3f4f6; }
+        .lp-divider-text { font-size: 10px; color: #9ca3af; font-weight: 700; letter-spacing: 1px; white-space: nowrap; }
 
+        /* ── BMI preview card ── */
+        .lp-bmi-card {
+          border-radius: 8px;
+          padding: 11px 14px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border: 1.5px solid #e5e7eb;
+          background: #f9fafb;
+          animation: fadeSlideIn 0.25s ease;
+        }
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(-4px); }
+          to   { opacity: 1; transform: none; }
+        }
+        .lp-bmi-label {
+          font-size: 10px; color: #9ca3af; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px;
+        }
+        .lp-bmi-value { font-size: 20px; font-weight: 800; line-height: 1; }
+        .lp-bmi-pill {
+          font-size: 11px; font-weight: 700;
+          padding: 4px 10px; border-radius: 99px;
+        }
+
+        /* ── Age group buttons ── */
         .lp-age-row { display: flex; gap: 8px; }
         .lp-age-btn {
-          flex: 1; padding: 9px 0; background: #f9fafb; border: 1.5px solid #e5e7eb;
-          border-radius: 8px; color: #6b7280; font-size: 12px; font-weight: 700;
-          cursor: pointer; transition: all 0.2s;
+          flex: 1; padding: 9px 0;
+          background: #f9fafb;
+          border: 1.5px solid #e5e7eb;
+          border-radius: 8px;
+          color: #6b7280;
+          font-size: 12px; font-weight: 700;
+          cursor: pointer; font-family: inherit;
+          transition: all 0.2s;
         }
-        .lp-age-btn.active { border-color: #10b981; background: #10b981; color: #ffffff; }
+        .lp-age-btn:hover { border-color: #d1d5db; background: #f3f4f6; }
+        .lp-age-btn.active {
+          border-color: #10b981;
+          background: #10b981;
+          color: #ffffff;
+        }
+        .lp-age-content {
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
 
+        /* ── Submit button — matches app's CTA ── */
         .lp-submit {
-          width: 100%; padding: 14px; background: #10b981; color: #ffffff;
-          border: none; border-radius: 8px; font-size: 15px; font-weight: 800;
-          cursor: pointer; margin-top: 4px; transition: all 0.2s;
-          text-transform: uppercase; letter-spacing: 0.4px;
+          width: 100%; padding: 14px;
+          background: #10b981;
+          color: #ffffff;
+          border: none; border-radius: 8px;
+          font-size: 15px; font-weight: 800; font-family: inherit;
+          cursor: pointer; margin-top: 4px;
+          transition: background 0.2s, transform 0.15s;
+          letter-spacing: 0.4px;
+          text-transform: uppercase;
         }
-        .lp-submit:hover:not(:disabled) { background: #059669; transform: translateY(-1px); }
-        .lp-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+        .lp-submit:hover:not(:disabled) {
+          background: #059669;
+          transform: translateY(-1px);
+        }
+        .lp-submit:active:not(:disabled) {
+          transform: translateY(1px);
+        }
+        .lp-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
-        .lp-error { background: #fef2f2; border: 1.5px solid #fecaca; color: #dc2626; padding: 10px; border-radius: 10px; text-align: center; font-size: 13px; font-weight: 600; }
-        .lp-success { background: #ecfdf5; border: 1.5px solid #a7f3d0; color: #065f46; padding: 10px; border-radius: 10px; text-align: center; font-size: 13px; font-weight: 600; }
+        /* ── Feedback ── */
+        .lp-error, .lp-success {
+          padding: 10px 14px;
+          border-radius: 10px;
+          font-size: 13px; font-weight: 600;
+          text-align: center;
+          animation: fadeSlideIn 0.25s ease;
+        }
+        .lp-error   { background: #fef2f2; border: 1.5px solid #fecaca; color: #dc2626; }
+        .lp-success { background: #ecfdf5; border: 1.5px solid #a7f3d0; color: #065f46; }
 
-        .lp-footer { text-align: center; margin-top: 18px; font-size: 13px; color: #9ca3af; }
-        .lp-footer button { background: none; border: none; color: #10b981; font-weight: 700; cursor: pointer; }
+        /* ── Footer ── */
+        .lp-footer {
+          text-align: center; margin-top: 18px;
+          font-size: 13px; color: #9ca3af; font-weight: 500;
+        }
+        .lp-footer button {
+          background: none; border: none;
+          color: #10b981; font-weight: 700;
+          cursor: pointer; font-size: 13px; font-family: inherit;
+        }
+        .lp-footer button:hover { text-decoration: underline; }
       `}</style>
 
       <div className="lp-root">
-        <div className="lp-blob" />
-        <div className="lp-blob lp-blob-2" />
+        {/* Soft background blobs */}
+        <div className="lp-blob" aria-hidden="true" />
+        <div className="lp-blob lp-blob-2" aria-hidden="true" />
 
         <div className="lp-card">
+
+          {/* ── Logo ── */}
           <div className="lp-logo">
-            <div className="lp-logo-icon"><ScanLine size={22} strokeWidth={2.5} /></div>
-            <div className="lp-logo-name">NutriScan <span>AI</span></div>
+            <div className="lp-logo-icon">
+              <ScanLine size={22} strokeWidth={2.5} />
+            </div>
+            <div>
+              <div className="lp-logo-name">NutriScan <span>AI</span></div>
+              <div className="lp-logo-powered">INTELLIGENT HEALTH AI</div>
+            </div>
           </div>
 
+          {/* ── Mode toggle ── */}
           <div className="lp-toggle">
-            <button className={`lp-toggle-btn ${mode === 'login' ? 'active' : ''}`} onClick={() => setMode('login')}>Log In</button>
-            <button className={`lp-toggle-btn ${mode === 'signup' ? 'active' : ''}`} onClick={() => setMode('signup')}>Sign Up</button>
+            <button
+              id="toggle-login"
+              type="button"
+              className={`lp-toggle-btn ${mode === 'login' ? 'active' : ''}`}
+              onClick={() => setMode('login')}
+            >
+              Log In
+            </button>
+            <button
+              id="toggle-signup"
+              type="button"
+              className={`lp-toggle-btn ${mode === 'signup' ? 'active' : ''}`}
+              onClick={() => setMode('signup')}
+            >
+              Sign Up
+            </button>
           </div>
 
+          {/* ── Heading ── */}
           <h1 className="lp-heading flex items-center gap-2">
-            {mode === 'login' ? 'Welcome back' : 'Create account'}
+            {mode === 'login' ? 'Welcome back' : 'Create your account'}
             {mode === 'login' && <Sparkles size={20} className="text-emerald-500" />}
           </h1>
           <p className="lp-sub">
-            {mode === 'login' ? 'Access your personalised food risk analysis.' : 'Join to unlock AI-powered food intelligence.'}
+            {mode === 'login'
+              ? 'Log in to get your personalised food risk analysis.'
+              : 'Join to unlock AI-powered food intelligence tailored to you.'}
           </p>
 
-          <form className="lp-form" onSubmit={handleSubmit}>
-            {mode === 'signup' && <Field id="name" label="Full Name" required value={name} onChange={setName} placeholder="Harshit Kumar" />}
-            <Field id="email" label="Email" type="email" required value={email} onChange={setEmail} placeholder="you@example.com" />
-            <Field id="password" label="Password" type="password" required value={password} onChange={setPassword} placeholder="••••••••" />
+          {/* ── Form ── */}
+          <form className="lp-form" onSubmit={handleSubmit} noValidate>
+
+            {mode === 'signup' && (
+              <Field
+                id="signup-name" label="Full Name" required
+                value={name} onChange={setName} placeholder="Harshit Kumar"
+              />
+            )}
+
+            <Field
+              id="auth-email" label="Email" type="email" required
+              value={email} onChange={setEmail} placeholder="you@example.com"
+            />
+
+            <Field
+              id="auth-password" label="Password" type="password" required
+              value={password} onChange={setPassword}
+              placeholder={mode === 'signup' ? 'Min. 6 characters' : '••••••••'}
+            />
 
             {mode === 'signup' && (
               <>
-                <div className="lp-row">
-                  <Field id="height" label="Height (cm)" type="number" value={height} onChange={setHeight} placeholder="175" />
-                  <Field id="weight" label="Weight (kg)" type="number" value={weight} onChange={setWeight} placeholder="70" />
+                {/* Divider */}
+                <div className="lp-divider">
+                  <div className="lp-divider-line" />
+                  <div className="lp-divider-text">HEALTH PROFILE (optional)</div>
+                  <div className="lp-divider-line" />
                 </div>
+
+                {/* Height + Weight */}
+                <div className="lp-row">
+                  <Field
+                    id="signup-height" label="Height" type="number"
+                    value={height} onChange={setHeight} placeholder="cm  e.g. 175"
+                  />
+                  <Field
+                    id="signup-weight" label="Weight" type="number"
+                    value={weight} onChange={setWeight} placeholder="kg  e.g. 70"
+                  />
+                </div>
+
+                {/* Live BMI preview */}
                 {bmi && bmiInfo && (
                   <div className="lp-bmi-card">
-                    <div><div className="lp-bmi-label">Your BMI</div><div className="lp-bmi-value" style={{ color: bmiInfo.color }}>{bmi}</div></div>
-                    <span className="lp-bmi-pill" style={{ background: bmiInfo.bg, color: bmiInfo.color }}>{bmiInfo.text}</span>
+                    <div>
+                      <div className="lp-bmi-label">Your BMI</div>
+                      <div className="lp-bmi-value" style={{ color: bmiInfo.color }}>{bmi}</div>
+                    </div>
+                    <span
+                      className="lp-bmi-pill flex items-center gap-1.5"
+                      style={{ background: bmiInfo.bg, color: bmiInfo.color }}
+                    >
+                      {bmiInfo.showCheck && <Check size={12} strokeWidth={3} />}
+                      {bmiInfo.text}
+                    </span>
                   </div>
                 )}
+
+                {/* Age group */}
                 <div className="lp-field">
                   <label className="lp-label">Age Group</label>
                   <div className="lp-age-row">
                     {[
-                      { id: 'child',  label: 'Child',  Icon: Baby },
+                      { id: 'child',  label: 'Child',  Icon: Baby           },
                       { id: 'adult',  label: 'Adult',  Icon: PersonStanding },
-                      { id: 'senior', label: 'Senior', Icon: User },
+                      { id: 'senior', label: 'Senior', Icon: User           },
                     ].map(g => (
-                      <button key={g.id} type="button" className={`lp-age-btn ${ageGroup === g.id ? 'active' : ''}`} onClick={() => setAgeGroup(g.id)}>
-                        <div className="flex items-center justify-center gap-2"><g.Icon size={14} />{g.label}</div>
+                      <button
+                        key={g.id}
+                        type="button"
+                        id={`age-${g.id}`}
+                        className={`lp-age-btn ${ageGroup === g.id ? 'active' : ''}`}
+                        onClick={() => setAgeGroup(g.id)}
+                      >
+                        <div className="lp-age-content">
+                          <g.Icon size={14} strokeWidth={ageGroup === g.id ? 3 : 2} />
+                          <span>{g.label}</span>
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -322,18 +477,34 @@ export default function LoginPage({ onAuth }) {
               </>
             )}
 
-            {error && <div className="lp-error">{error}</div>}
-            {success && <div className="lp-success">{success}</div>}
+            {/* Feedback */}
+            {error   && <div className="lp-error"   role="alert">{error}</div>}
+            {success && <div className="lp-success" role="status">{success}</div>}
 
-            <button type="submit" className="lp-submit flex items-center justify-center gap-2" disabled={loading}>
-              {loading ? 'Processing...' : (mode === 'login' ? 'Log In' : 'Sign Up')}
-              {!loading && <ArrowRight size={18} strokeWidth={3} />}
+            <button
+              id="auth-submit"
+              type="submit"
+              className="lp-submit flex items-center justify-center gap-2"
+              disabled={loading || !!success}
+            >
+              {loading
+                ? (mode === 'login' ? 'Logging in…' : 'Creating account…')
+                : (
+                  <>
+                    <span>{mode === 'login' ? 'Log In' : 'Create Account'}</span>
+                    <ArrowRight size={18} strokeWidth={3} />
+                  </>
+                )}
             </button>
           </form>
 
+          {/* Footer */}
           <div className="lp-footer">
-            {mode === 'login' ? <>New here? <button onClick={() => setMode('signup')}>Sign Up</button></> : <>Member? <button onClick={() => setMode('login')}>Log In</button></>}
+            {mode === 'login'
+              ? <>Don't have an account? <button onClick={() => setMode('signup')}>Sign Up</button></>
+              : <>Already have an account? <button onClick={() => setMode('login')}>Log In</button></>}
           </div>
+
         </div>
       </div>
     </>
