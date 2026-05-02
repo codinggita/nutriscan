@@ -14,6 +14,7 @@
 | :--- | :--- |
 | **🌐 Frontend Deployment** | [nutriscan-food.vercel.app](https://nutriscan-food.vercel.app/) |
 | **⚙️ Backend API** | [nutriscan-6okf.onrender.com](https://nutriscan-6okf.onrender.com/) |
+| **📄 API Documentation** | [Postman Collection](https://documenter.getpostman.com/view/50839854/2sBXqKofJw) |
 | **🎨 Figma Design** | [View Design Prototype](https://www.figma.com/design/wFYOlNMilBqg11MpBWax2m/first?node-id=6-12&t=jEuMUfFKnn8rHxBG-1) |
 
 ---
