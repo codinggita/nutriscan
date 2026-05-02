@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { Helmet } from 'react-helmet';
 import LoginPage          from './components/LoginPage';
 import Scanner             from './components/Scanner';
 import NutritionCard       from './components/NutritionCard';
@@ -55,6 +56,24 @@ function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [isManualOpen, setIsManualOpen] = useState(false);
+
+  // ── SEO Metadata ───────────────────────────────────────────────────────────
+  const getSEOMetadata = () => {
+    let title = "NutriScan AI | Intelligent Food Analysis";
+    let desc = "Instantly scan food labels to detect hidden risks, harmful additives, and nutritional insights tailored to your health profile.";
+    
+    if (tab === 'history') title = "Scan History | NutriScan AI";
+    if (tab === 'compare') title = "Product Comparison | NutriScan AI";
+    if (tab === 'profile') title = "Your Profile | NutriScan AI";
+    
+    if (screen === 'result' && product) {
+      title = `${product.name || 'Product'} Analysis | NutriScan AI`;
+      desc = `Deep dive into the ingredients and nutritional value of ${product.name}. Check for harmful additives and health risks.`;
+    }
+    
+    return { title, desc };
+  };
+  const seo = getSEOMetadata();
 
   // ── Auth handlers ───────────────────────────────────────────────────────────
   const handleAuth = useCallback((newToken, user) => {
@@ -217,6 +236,15 @@ function App() {
 
   return (
     <div className="h-[100dvh] w-full bg-white font-sans flex flex-col overflow-hidden">
+      <Helmet>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.desc} />
+        <meta property="og:title" content={seo.title} />
+        <meta property="og:description" content={seo.desc} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://nutriscan-food.vercel.app/" />
+        <meta property="og:image" content="https://nutriscan-food.vercel.app/logo.png" />
+      </Helmet>
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <header className="flex items-center justify-between px-5 md:px-10 pt-4 md:pt-5 pb-3 md:pb-4 border-b border-gray-100 flex-shrink-0 bg-white z-10 w-full">
