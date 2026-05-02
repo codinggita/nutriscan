@@ -1,0 +1,290 @@
+[
+  {
+    "barcode": "8901719305917",
+    "name": "Hide and seek chocolate chip cookies",
+    "brand": "Parle",
+    "per100g": {
+      "sugar_g": 32.5,
+      "fat_g": 18,
+      "sodium_mg": 114,
+      "calories_kcal": 479,
+      "protein_g": 5.9,
+      "carbs_g": 73.4,
+      "fiber_g": 0
+    },
+    "serving_size_g": 100,
+    "image_url": "https://images.openfoodfacts.org/images/products/890/171/930/5917/front_fr.3.400.jpg"
+  },
+  {
+    "barcode": "8901030902932",
+    "name": "Fresh Tomato Ketchup",
+    "brand": "Kissan",
+    "per100g": {
+      "sugar_g": 26,
+      "fat_g": 0.666666666666667,
+      "sodium_mg": 378667,
+      "calories_kcal": 133.333333333333,
+      "protein_g": 1.33333333333333,
+      "carbs_g": 30.6666666666667,
+      "fiber_g": 0.666666666666667
+    },
+    "serving_size_g": 15,
+    "image_url": "https://images.openfoodfacts.org/images/products/890/103/090/2932/front_en.5.400.jpg"
+  },
+  {
+    "barcode": "8902268010871",
+    "name": "Item 8902268010871",
+    "brand": "Unknown",
+    "per100g": {
+      "sugar_g": 0,
+      "fat_g": 0,
+      "sodium_mg": 0,
+      "calories_kcal": 0,
+      "protein_g": 0,
+      "carbs_g": 0,
+      "fiber_g": 0
+    },
+    "serving_size_g": 100,
+    "image_url": "https://images.openfoodfacts.org/images/products/890/226/801/0871/front_en.3.400.jpg"
+  },
+  {
+    "barcode": "8901719125812",
+    "name": "hide & seek Milano choco filled cocoa rich biscuits",
+    "brand": "parle",
+    "per100g": {
+      "sugar_g": 38,
+      "fat_g": 28.8,
+      "sodium_mg": 102,
+      "calories_kcal": 533,
+      "protein_g": 4.4,
+      "carbs_g": 64,
+      "fiber_g": 0
+    },
+    "serving_size_g": 100,
+    "image_url": "https://images.openfoodfacts.org/images/products/890/171/912/5812/front_en.10.400.jpg"
+  },
+  {
+    "barcode": "8901030532719",
+    "name": "kissan fresh Tamato",
+    "brand": "Kissan",
+    "per100g": {
+      "sugar_g": 29.3333333333333,
+      "fat_g": 0.666666666666667,
+      "sodium_mg": 960,
+      "calories_kcal": 133.333333333333,
+      "protein_g": 1.33333333333333,
+      "carbs_g": 30.6666666666667,
+      "fiber_g": 0.666666666666667
+    },
+    "serving_size_g": 15,
+    "image_url": "https://images.openfoodfacts.org/images/products/890/103/053/2719/front_en.27.400.jpg"
+  },
+  {
+    "barcode": "1200108004163",
+    "name": "sour cream and onion",
+    "brand": "lays",
+    "per100g": {
+      "sugar_g": 0,
+      "fat_g": 0,
+      "sodium_mg": 0,
+      "calories_kcal": 0,
+      "protein_g": 0,
+      "carbs_g": 0,
+      "fiber_g": 0
+    },
+    "serving_size_g": 100,
+    "image_url": "https://images.openfoodfacts.org/images/products/120/010/800/4163/front_en.3.400.jpg"
+  },
+  {
+    "barcode": "8909081005619",
+    "name": "Bingo Mad Angles Mystery Pickle",
+    "brand": "Bingo",
+    "per100g": {
+      "sugar_g": 4.3,
+      "fat_g": 31.7,
+      "sodium_mg": 1132200,
+      "calories_kcal": 536,
+      "protein_g": 5.9,
+      "carbs_g": 58.3,
+      "fiber_g": 0
+    },
+    "serving_size_g": 100,
+    "image_url": "https://images.openfoodfacts.org/images/products/890/908/100/5619/front_en.3.400.jpg"
+  },
+  {
+    "barcode": "7622202846816",
+    "name": "Cadbury Fuse",
+    "brand": "Cadbury",
+    "per100g": {
+      "sugar_g": 39.9,
+      "fat_g": 34.6,
+      "sodium_mg": 220,
+      "calories_kcal": 549,
+      "protein_g": 9.5,
+      "carbs_g": 51.6,
+      "fiber_g": 0
+    },
+    "serving_size_g": 100,
+    "image_url": "https://images.openfoodfacts.org/images/products/762/220/284/6816/front_en.14.400.jpg"
+  },
+  {
+    "barcode": "7622202815096",
+    "name": "Dairy Milk Crackle Chocolate",
+    "brand": "Cadbury",
+    "per100g": {
+      "sugar_g": 53.3,
+      "fat_g": 24.6,
+      "sodium_mg": 94,
+      "calories_kcal": 507,
+      "protein_g": 7.1,
+      "carbs_g": 65.3,
+      "fiber_g": 0
+    },
+    "serving_size_g": 10.5,
+    "image_url": "https://images.openfoodfacts.org/images/products/762/220/281/5096/front_en.17.400.jpg"
+  },
+  {
+    "barcode": "3017932033003",
+    "name": "Amul butter scotch ice cream",
+    "brand": "Unknown",
+    "per100g": {
+      "sugar_g": 22.6,
+      "fat_g": 14.1,
+      "sodium_mg": 46,
+      "calories_kcal": 251,
+      "protein_g": 4.1,
+      "carbs_g": 26,
+      "fiber_g": 0
+    },
+    "serving_size_g": 100,
+    "image_url": "https://images.openfoodfacts.org/images/products/301/793/203/3003/front_en.3.400.jpg"
+  },
+  {
+    "barcode": "8901262175814",
+    "name": "Amul VANILLA ROYALE",
+    "brand": "Amul",
+    "per100g": {
+      "sugar_g": 20.74,
+      "fat_g": 12.99,
+      "sodium_mg": 52240,
+      "calories_kcal": 214.79,
+      "protein_g": 3.73,
+      "carbs_g": 20.74,
+      "fiber_g": 0
+    },
+    "serving_size_g": 67,
+    "image_url": "https://images.openfoodfacts.org/images/products/890/126/217/5814/front_en.5.400.jpg"
+  },
+  {
+    "barcode": "8901262152938",
+    "name": "Chocolate Spread Hazelnut",
+    "brand": "Amul",
+    "per100g": {
+      "sugar_g": 55,
+      "fat_g": 31,
+      "sodium_mg": 3,
+      "calories_kcal": 535,
+      "protein_g": 5.5,
+      "carbs_g": 60,
+      "fiber_g": 0
+    },
+    "serving_size_g": 30,
+    "image_url": "https://images.openfoodfacts.org/images/products/890/126/215/2938/front_en.3.400.jpg"
+  },
+  {
+    "barcode": "6905058011104",
+    "name": "Kitkat",
+    "brand": "Unknown",
+    "per100g": {
+      "sugar_g": 0,
+      "fat_g": 0,
+      "sodium_mg": 0,
+      "calories_kcal": 0,
+      "protein_g": 0,
+      "carbs_g": 0,
+      "fiber_g": 0
+    },
+    "serving_size_g": 100,
+    "image_url": "https://images.openfoodfacts.org/images/products/690/505/801/1104/front_en.3.400.jpg"
+  },
+  {
+    "barcode": "8939997430236",
+    "name": "bebe burp Ragi Cookies",
+    "brand": "bebe burp",
+    "per100g": {
+      "sugar_g": 14.4,
+      "fat_g": 16.2,
+      "sodium_mg": 138.7,
+      "calories_kcal": 462.9,
+      "protein_g": 7.1,
+      "carbs_g": 72.3,
+      "fiber_g": 4.3
+    },
+    "serving_size_g": 50,
+    "image_url": "https://images.openfoodfacts.org/images/products/893/999/743/0236/front_en.3.400.jpg"
+  },
+  {
+    "barcode": "8908005345008",
+    "name": "Ragi Biscuit",
+    "brand": "Unknown",
+    "per100g": {
+      "sugar_g": 18,
+      "fat_g": 33,
+      "sodium_mg": 150,
+      "calories_kcal": 551,
+      "protein_g": 6,
+      "carbs_g": 56,
+      "fiber_g": 3
+    },
+    "serving_size_g": 50,
+    "image_url": "https://images.openfoodfacts.org/images/products/890/800/534/5008/front_en.3.400.jpg"
+  },
+  {
+    "barcode": "8908017693234",
+    "name": "Ragi Chocolate Cookie",
+    "brand": "Unknown",
+    "per100g": {
+      "sugar_g": 29.7,
+      "fat_g": 21,
+      "sodium_mg": 51.5,
+      "calories_kcal": 478.7,
+      "protein_g": 8.5,
+      "carbs_g": 64,
+      "fiber_g": 8.8
+    },
+    "serving_size_g": 50,
+    "image_url": "https://images.openfoodfacts.org/images/products/890/801/769/3234/front_en.3.400.jpg"
+  },
+  {
+    "barcode": "8908006217120",
+    "name": "Mighty Puffs Choco Ragi",
+    "brand": "Mighty",
+    "per100g": {
+      "sugar_g": 12,
+      "fat_g": 15,
+      "sodium_mg": 250,
+      "calories_kcal": 410,
+      "protein_g": 8,
+      "carbs_g": 65,
+      "fiber_g": 5
+    },
+    "serving_size_g": 30,
+    "image_url": "https://images.openfoodfacts.org/images/products/890/800/621/7120/front_en.3.400.jpg"
+  },
+  {
+    "barcode": "8906055440377",
+    "name": "Ragi Flour",
+    "brand": "Millet",
+    "per100g": {
+      "sugar_g": 0,
+      "fat_g": 1.5,
+      "sodium_mg": 5,
+      "calories_kcal": 336,
+      "protein_g": 7.3,
+      "carbs_g": 72,
+      "fiber_g": 11.2
+    },
+    "serving_size_g": 100,
+    "image_url": "https://images.openfoodfacts.org/images/products/890/605/544/0377/front_en.3.400.jpg"
+  }
+]
