@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
 
   // Profile
   ageGroup:  { type: String, enum: ['child', 'adult', 'senior'], default: 'adult' },
-  sessionId: { type: String, default: null, index: true },
+  sessionId: { type: String, default: null },
   
   // Preferences
   autoFlagHighSugar: { type: Boolean, default: false },
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // ── Pre-save hooks ────────────────────────────────────────────────────────────
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
   // Hash password only when modified
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 12);
@@ -51,8 +51,6 @@ userSchema.pre('save', async function (next) {
     this.bmi         = calcBMI(this.height, this.weight);
     this.bmiCategory = bmiCategory(this.bmi);
   }
-
-  next();
 });
 
 // ── Instance method ───────────────────────────────────────────────────────────
