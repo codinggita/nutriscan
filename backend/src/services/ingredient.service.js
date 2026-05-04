@@ -24,15 +24,11 @@ export const detectIngredients = async (ingredientText) => {
   if (!ingredientText || typeof ingredientText !== 'string') return [];
 
   const lower = ingredientText.toLowerCase();
-  const detectedCodes = new Set();
+  const detectedCodes = SEARCH_PATTERNS
+    .filter(({ patterns }) => patterns.some(p => lower.includes(p)))
+    .map(({ code }) => code);
 
-  for (const { patterns, code } of SEARCH_PATTERNS) {
-    if (patterns.some(p => lower.includes(p))) {
-      detectedCodes.add(code);
-    }
-  }
-
-  if (detectedCodes.size === 0) return [];
+  if (detectedCodes.length === 0) return [];
 
   try {
     const additives = await Additive.find({ code: { $in: [...detectedCodes] } }).lean();
