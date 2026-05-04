@@ -47,29 +47,28 @@ export const getDailySummary = async (sessionId) => {
     startOfDay.setHours(0, 0, 0, 0);
 
     const scans = await Scan.find({ sessionId, timestamp: { $gte: startOfDay } }).lean();
-    const summary = { ...empty, scanCount: scans.length, scans: [] };
 
-    for (const scan of scans) {
+    const totals = scans.reduce((acc, scan) => {
       const n = scan.nutrition || {};
-      const factor = (scan.serving_size_g || 100) / 100;
-      summary.totalSugar_g += (n.sugar_g || 0) * factor;
-      summary.totalFat_g += (n.fat_g || 0) * factor;
-      summary.totalSodium_mg += (n.sodium_mg || 0) * factor;
-      summary.totalCalories_kcal += (n.calories_kcal || 0) * factor;
+      const f = (scan.serving_size_g || 100) / 100;
+      acc.totalSugar_g      += (n.sugar_g      || 0) * f;
+      acc.totalFat_g        += (n.fat_g        || 0) * f;
+      acc.totalSodium_mg    += (n.sodium_mg    || 0) * f;
+      acc.totalCalories_kcal+= (n.calories_kcal|| 0) * f;
+      acc.scans.push({ name: scan.product_name, risk: scan.risk?.level, nutriScore: scan.nutriScore?.grade, timestamp: scan.timestamp });
+      return acc;
+    }, { totalSugar_g: 0, totalFat_g: 0, totalSodium_mg: 0, totalCalories_kcal: 0, scans: [] });
 
-      summary.scans.push({
-        name: scan.product_name,
-        risk: scan.risk?.level,
-        nutriScore: scan.nutriScore?.grade,
-        timestamp: scan.timestamp,
-      });
-    }
-
-    summary.totalSugar_g = parseFloat(summary.totalSugar_g.toFixed(1));
-    summary.totalFat_g = parseFloat(summary.totalFat_g.toFixed(1));
-    summary.totalSodium_mg = parseFloat(summary.totalSodium_mg.toFixed(0));
-    summary.totalCalories_kcal = parseFloat(summary.totalCalories_kcal.toFixed(0));
-    summary.sugarTsp = parseFloat((summary.totalSugar_g / 4).toFixed(1));
+    const summary = {
+      ...empty,
+      scanCount:          scans.length,
+      totalSugar_g:       parseFloat(totals.totalSugar_g.toFixed(1)),
+      totalFat_g:         parseFloat(totals.totalFat_g.toFixed(1)),
+      totalSodium_mg:     parseFloat(totals.totalSodium_mg.toFixed(0)),
+      totalCalories_kcal: parseFloat(totals.totalCalories_kcal.toFixed(0)),
+      sugarTsp:           parseFloat((totals.totalSugar_g / 4).toFixed(1)),
+      scans:              totals.scans,
+    };
 
     return summary;
   } catch (err) {
