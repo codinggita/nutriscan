@@ -35,7 +35,6 @@ export default function HistoryView({ sessionId, backendUrl, onProductClick }) {
   const [showOlder, setShowOlder] = useState(false);
 
   const fetchData = async (forceRefetch = false) => {
-    // If not forcing refetch, try to load from sessionStorage first
     if (!forceRefetch) {
       const cachedHistory = sessionStorage.getItem(`nutriscan_history_${sessionId}`);
       const cachedSummary = sessionStorage.getItem(`nutriscan_summary_${sessionId}`);
@@ -43,14 +42,13 @@ export default function HistoryView({ sessionId, backendUrl, onProductClick }) {
         setHistory(JSON.parse(cachedHistory));
         setSummary(JSON.parse(cachedSummary));
         setLoading(false);
-        // We can optionally return here if we don't want background updates, 
-        // but fetching in the background keeps it fresh. For hackathon, let's just 
-        // skip fetching if we have cache, unless forceRefetch is true (Refresh button).
-        return;
+      } else {
+        setLoading(true);
       }
+    } else {
+      setLoading(true);
     }
 
-    setLoading(true);
     try {
       const headers = { 'x-session-id': sessionId };
       const [histRes, sumRes] = await Promise.all([
@@ -99,26 +97,20 @@ export default function HistoryView({ sessionId, backendUrl, onProductClick }) {
 
   useEffect(() => { fetchData(); }, [sessionId, backendUrl]); // eslint-disable-line
 
-  // ── Group History by Date ──
-  const todayScans = [];
-  const yesterdayScans = [];
-  const olderScans = [];
-
   const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterdayStart = new Date(todayStart);
-  yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+  const todayStart     = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterdayStart = new Date(todayStart.getTime() - 86_400_000);
 
-  history.forEach(scan => {
-    const d = new Date(scan.timestamp);
-    if (d >= todayStart) {
-      todayScans.push(scan);
-    } else if (d >= yesterdayStart) {
-      yesterdayScans.push(scan);
-    } else {
-      olderScans.push(scan);
-    }
-  });
+  const { todayScans, yesterdayScans, olderScans } = history.reduce(
+    (acc, scan) => {
+      const d = new Date(scan.timestamp);
+      if      (d >= todayStart)     acc.todayScans.push(scan);
+      else if (d >= yesterdayStart) acc.yesterdayScans.push(scan);
+      else                          acc.olderScans.push(scan);
+      return acc;
+    },
+    { todayScans: [], yesterdayScans: [], olderScans: [] }
+  );
 
   const renderScanItem = (scan) => (
     <div
@@ -187,7 +179,7 @@ export default function HistoryView({ sessionId, backendUrl, onProductClick }) {
 
   return (
     <div className="flex flex-col gap-6 pb-6 pt-2 max-w-4xl mx-auto w-full">
-      {/* ── Premium Header ── */}
+      {/* Premium Header */}
       <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-black text-gray-900 tracking-tight leading-tight mb-2">
@@ -208,7 +200,7 @@ export default function HistoryView({ sessionId, backendUrl, onProductClick }) {
 
       <DailySugarTracker summary={summary} />
 
-      {/* ── List Section ── */}
+      {/* List Section */}
       <div className="mt-2">
         {history.length === 0 ? (
           <div className="bg-white border md:border-2 border-dashed border-gray-200 rounded-[2rem] p-12 flex flex-col items-center justify-center text-center shadow-sm">

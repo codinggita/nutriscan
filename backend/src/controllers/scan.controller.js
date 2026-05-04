@@ -18,25 +18,20 @@ export const getProductByBarcode = async (req, res) => {
   }
 
   try {
-    // ── 1. MongoDB Cache (Fastest — check our DB first) ───────────────────────
-    try {
-      const dbProduct = await Product.findOne({ barcode }).lean();
-      if (dbProduct) {
-        console.log(`[Cache HIT] Barcode ${barcode} found in MongoDB.`);
-        return res.json({ ...dbProduct, id: undefined, _id: undefined, source: 'database' });
-      }
-    } catch (dbErr) {
-      console.error('DB product lookup error:', dbErr.message);
+    const dbProduct = await Product.findOne({ barcode }).lean().catch(() => null);
+    if (dbProduct) {
+      console.log(`[Cache HIT] Barcode ${barcode} found in MongoDB.`);
+      return res.json({ ...dbProduct, id: undefined, _id: undefined, source: 'database' });
     }
 
-    // ── 2. Static JSON Fallback (Offline-safe) ────────────────────────────────
+    // Fallback to local JSON
     const localProduct = indianSnacks.find(item => item.barcode === barcode);
     if (localProduct) {
       console.log(`[Local HIT] Barcode ${barcode} found in indianSnacks.json.`);
       return res.json({ ...localProduct, ingredients_text: '', source: 'fallback' });
     }
 
-    // ── 3. OpenFoodFacts API (Last resort — external call) ────────────────────
+    // Fetch from OpenFoodFacts
     const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`, {
       headers: { 'User-Agent': 'NutriScanHackathonApp/1.0 (contact@nutriscan.app)' }
     });
@@ -77,7 +72,7 @@ export const getProductByBarcode = async (req, res) => {
         source: 'openfoodfacts',
       };
 
-      // Cache to DB silently for future scans
+      // Cache result for future scans
       Product.updateOne({ barcode }, { $setOnInsert: { ...mapped, source: 'openfoodfacts' } }, { upsert: true })
         .catch(() => {});
 
@@ -94,8 +89,7 @@ export const getProductByBarcode = async (req, res) => {
 
 export const getFeaturedProducts = async (req, res) => {
   try {
-    // Return the local snacks list for the "Explore" section
-    // We can add some logic here later to randomize or filter
+    // Return local snacks for discovery
     return res.json(indianSnacks);
   } catch (error) {
     console.error('Featured products error:', error.message);
@@ -140,32 +134,28 @@ export const searchProducts = async (req, res) => {
   } catch (err) {
     console.warn(`Search API warning (${err.message}), falling back to local database.`);
     
-    // ── Smart Fallback with Fuse.js ──────────────────────────────────────────
+    // Fallback to local Fuse.js search
     const fuse = new Fuse(indianSnacks, {
       keys: ['name', 'brand'],
       threshold: 0.3, // typo tolerance
       minMatchCharLength: 2
     });
 
-    const searchResults = fuse.search(query);
-    const fallbackResults = searchResults.map(result => {
-      const item = result.item;
-      return {
-        name:             item.name,
-        brand:            item.brand,
-        image_url:        item.image_url,
-        barcode:          item.barcode,
-        nutrition:        {
-          sugars_100g: item.per100g?.sugar_g || 0,
-          fat_100g: item.per100g?.fat_g || 0,
-          sodium_100g: (item.per100g?.sodium_mg || 0) / 1000, 
-          'energy-kcal_100g': item.per100g?.calories_kcal || 0,
-        },
-        ingredients_text: '',
-        serving_size_g:   item.serving_size_g || 100,
-        source:           'fallback'
-      };
-    }).slice(0, 10);
+    const fallbackResults = fuse.search(query).slice(0, 10).map(({ item }) => ({
+      name:             item.name,
+      brand:            item.brand,
+      image_url:        item.image_url,
+      barcode:          item.barcode,
+      nutrition: {
+        sugars_100g:         item.per100g?.sugar_g      || 0,
+        fat_100g:            item.per100g?.fat_g        || 0,
+        sodium_100g:        (item.per100g?.sodium_mg   || 0) / 1000,
+        'energy-kcal_100g':  item.per100g?.calories_kcal|| 0,
+      },
+      ingredients_text: '',
+      serving_size_g:   item.serving_size_g || 100,
+      source:           'fallback',
+    }));
 
     if (fallbackResults.length > 0) {
       return res.json(fallbackResults);

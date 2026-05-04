@@ -1,23 +1,11 @@
-/**
- * Rule-Based Explanation Engine
- * Replaces Gemini AI with deterministic, instant, offline-capable explanations.
- * 
- * Logic is based on:
- *  - User's medical conditions (Diabetes, Hypertension, Obesity, Heart, etc.)
- *  - User's age group (child, adult, senior)
- *  - Product's nutritional signals from riskService
- */
+const DISCLAIMER = 'Based on nutritional data. Not a medical diagnosis.';
 
-// ── Helper: pick the single most dangerous signal ──────────────────────────
 function getTopSignal(signals = []) {
   const priority = ['Very high sugar', 'Very high sodium', 'Very high fat', 'Elevated sugar', 'Elevated sodium', 'Elevated fat'];
-  for (const p of priority) {
-    if (signals.includes(p)) return p;
-  }
-  return signals[0] || null;
+  return priority.find(p => signals.includes(p)) || signals[0] || null;
 }
 
-// ── 1. Explain Risk ────────────────────────────────────────────────────────
+// 1. Explain Risk based on health conditions
 export const explainRisk = (productName, per100g, risk, conditions = []) => {
   const sugar   = per100g.sugar_g   || 0;
   const fat     = per100g.fat_g     || 0;
@@ -28,78 +16,54 @@ export const explainRisk = (productName, per100g, risk, conditions = []) => {
 
   const name = productName || 'This product';
 
-  // ── Condition-specific warnings (highest priority) ────────────────────────
+  // Condition-specific warnings (highest priority)
 
-  if (conditions.includes('Diabetes') || conditions.includes('Pre-diabetic')) {
-    if (sugar > 20) {
-      return `Diabetes Alert: ${name} contains ${sugar}g of sugar per 100g, which can cause a rapid blood glucose spike. Daily consumption is strongly discouraged for diabetics. Based on nutritional data. Not a medical diagnosis.`;
-    }
-    if (sugar > 10) {
-      return `Caution: ${name} has moderate sugar (${sugar}g) which may affect blood sugar control. Consume in small portions and monitor glucose levels. Based on nutritional data. Not a medical diagnosis.`;
-    }
+  const has = (...keys) => keys.some(k => conditions.includes(k));
+
+  if (has('Diabetes', 'Pre-diabetic')) {
+    if (sugar > 20) return `Diabetes Alert: ${name} contains ${sugar}g of sugar per 100g, which can cause a rapid blood glucose spike. Daily consumption is strongly discouraged for diabetics. ${DISCLAIMER}`;
+    if (sugar > 10) return `Caution: ${name} has moderate sugar (${sugar}g) which may affect blood sugar control. Consume in small portions and monitor glucose levels. ${DISCLAIMER}`;
   }
 
-  if (conditions.includes('Hypertension') || conditions.includes('High BP')) {
-    if (sodium > 600) {
-      return `Blood Pressure Alert: ${name} has very high sodium (${sodium}mg), which can elevate blood pressure. Avoid regular consumption if you have hypertension. Based on nutritional data. Not a medical diagnosis.`;
-    }
-    if (sodium > 300) {
-      return `Sodium Warning: ${name} contains ${sodium}mg of sodium. People with high blood pressure should limit this to small portions. Based on nutritional data. Not a medical diagnosis.`;
-    }
+  if (has('Hypertension', 'High BP')) {
+    if (sodium > 600) return `Blood Pressure Alert: ${name} has very high sodium (${sodium}mg), which can elevate blood pressure. Avoid regular consumption if you have hypertension. ${DISCLAIMER}`;
+    if (sodium > 300) return `Sodium Warning: ${name} contains ${sodium}mg of sodium. People with high blood pressure should limit this to small portions. ${DISCLAIMER}`;
   }
 
-  if (conditions.includes('Obesity') || conditions.includes('Overweight')) {
-    if (fat > 15 && cals > 400) {
-      return `Weight Management Alert: ${name} is high in both fat (${fat}g) and calories (${cals} kcal). This can significantly hinder weight loss goals. Based on nutritional data. Not a medical diagnosis.`;
-    }
-    if (cals > 450) {
-      return `High Calorie Alert: ${name} provides ${cals} kcal per 100g. Regular consumption can contribute to weight gain. Limit intake. Based on nutritional data. Not a medical diagnosis.`;
-    }
+  if (has('Obesity', 'Overweight')) {
+    if (fat > 15 && cals > 400) return `Weight Management Alert: ${name} is high in both fat (${fat}g) and calories (${cals} kcal). This can significantly hinder weight loss goals. ${DISCLAIMER}`;
+    if (cals > 450) return `High Calorie Alert: ${name} provides ${cals} kcal per 100g. Regular consumption can contribute to weight gain. Limit intake. ${DISCLAIMER}`;
   }
 
-  if (conditions.includes('Heart Disease') || conditions.includes('Cholesterol')) {
-    if (fat > 15) {
-      return `Heart Health Alert: ${name} is high in fat (${fat}g per 100g). High fat intake is associated with increased cholesterol and cardiovascular risk. Based on nutritional data. Not a medical diagnosis.`;
-    }
-    if (sodium > 500) {
-      return `Cardiac Warning: ${name} contains high sodium (${sodium}mg) which strains the heart. People with heart conditions should avoid this product. Based on nutritional data. Not a medical diagnosis.`;
-    }
+  if (has('Heart Disease', 'Cholesterol')) {
+    if (fat > 15) return `Heart Health Alert: ${name} is high in fat (${fat}g per 100g). High fat intake is associated with increased cholesterol and cardiovascular risk. ${DISCLAIMER}`;
+    if (sodium > 500) return `Cardiac Warning: ${name} contains high sodium (${sodium}mg) which strains the heart. People with heart conditions should avoid this product. ${DISCLAIMER}`;
   }
 
-  if (conditions.includes('Kidney Disease')) {
-    if (sodium > 400) {
-      return `Kidney Alert: ${name} has high sodium (${sodium}mg). Excess sodium creates extra workload on kidneys. Strictly avoid for kidney patients. Based on nutritional data. Not a medical diagnosis.`;
-    }
+  if (has('Kidney Disease') && sodium > 400) {
+    return `Kidney Alert: ${name} has high sodium (${sodium}mg). Excess sodium creates extra workload on kidneys. Strictly avoid for kidney patients. ${DISCLAIMER}`;
   }
 
-  // ── Age-specific warnings ─────────────────────────────────────────────────
+  // Age-specific and general warnings
+
+  const topSignal = getTopSignal(signals);
 
   if (level === 'HIGH') {
-    const topSignal = getTopSignal(signals);
-    if (topSignal === 'Very high sugar' && fat > 10) {
-      return `${name} is high in both sugar (${sugar}g) and fat (${fat}g), posing a combined risk of obesity and metabolic disorders. Daily consumption is not recommended. Based on nutritional data. Not a medical diagnosis.`;
-    }
-    if (topSignal === 'Very high sodium') {
-      return `${name} contains dangerously high sodium (${sodium}mg). Regular consumption can lead to water retention, high blood pressure, and kidney stress. Based on nutritional data. Not a medical diagnosis.`;
-    }
-    if (topSignal === 'Very high sugar') {
-      return `${name} is extremely high in sugar (${sugar}g per 100g), which can cause energy crashes, tooth decay, and long-term metabolic issues. Avoid daily use. Based on nutritional data. Not a medical diagnosis.`;
-    }
-    if (topSignal === 'Very high fat') {
-      return `${name} is very high in fat (${fat}g per 100g). Excess fat in diet can raise bad cholesterol (LDL) and increase cardiovascular risk over time. Based on nutritional data. Not a medical diagnosis.`;
-    }
-    return `${name} has a HIGH health risk profile due to elevated levels of ${signals.slice(0,2).join(' and ')}. Limit consumption. Based on nutritional data. Not a medical diagnosis.`;
+    if (topSignal === 'Very high sugar' && fat > 10) return `${name} is high in both sugar (${sugar}g) and fat (${fat}g), posing a combined risk of obesity and metabolic disorders. Daily consumption is not recommended. ${DISCLAIMER}`;
+    if (topSignal === 'Very high sodium') return `${name} contains dangerously high sodium (${sodium}mg). Regular consumption can lead to water retention, high blood pressure, and kidney stress. ${DISCLAIMER}`;
+    if (topSignal === 'Very high sugar') return `${name} is extremely high in sugar (${sugar}g per 100g), which can cause energy crashes, tooth decay, and long-term metabolic issues. ${DISCLAIMER}`;
+    if (topSignal === 'Very high fat') return `${name} is very high in fat (${fat}g per 100g). Excess fat in diet can raise bad cholesterol (LDL) and increase cardiovascular risk over time. ${DISCLAIMER}`;
+    return `${name} has a HIGH health risk profile due to elevated levels of ${signals.slice(0, 2).join(' and ')}. Limit consumption. ${DISCLAIMER}`;
   }
 
   if (level === 'MODERATE') {
-    return `${name} has a moderate nutritional risk. It contains ${topSignal ? topSignal.toLowerCase() : 'concerning nutrient levels'} — fine occasionally but not as a daily snack. Based on nutritional data. Not a medical diagnosis.`;
+    return `${name} has a moderate nutritional risk. It contains ${topSignal ? topSignal.toLowerCase() : 'concerning nutrient levels'} — fine occasionally but not as a daily snack. ${DISCLAIMER}`;
   }
 
-  // LOW risk
-  return `${name} has a low nutritional risk and is generally acceptable for occasional consumption. Maintain a balanced diet overall. Based on nutritional data. Not a medical diagnosis.`;
+  return `${name} has a low nutritional risk and is generally acceptable for occasional consumption. Maintain a balanced diet overall. ${DISCLAIMER}`;
 };
 
-// ── 2. Reason Alternative ──────────────────────────────────────────────────
+// 2. Reason Alternative: explains why one product is better than another
 export const reasonAlternative = (originalName, altName, originalPer100g, altPer100g) => {
   const sugarDiff  = (originalPer100g.sugar_g   || 0) - (altPer100g.sugar_g   || 0);
   const fatDiff    = (originalPer100g.fat_g     || 0) - (altPer100g.fat_g     || 0);
@@ -122,7 +86,7 @@ export const reasonAlternative = (originalName, altName, originalPer100g, altPer
   return `${altName} offers a better overall nutritional profile compared to ${originalName}.`;
 };
 
-// ── 3. Compare Verdict ─────────────────────────────────────────────────────
+// 3. Compare Verdict: summary for the comparison view
 export const generateCompareVerdict = (product1Name, score1, risk1, product2Name, score2, risk2, conditions = []) => {
   const conditionStr = conditions.length > 0 ? ` for someone with ${conditions.join(' and ')}` : '';
 
