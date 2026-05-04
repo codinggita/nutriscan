@@ -27,7 +27,7 @@ NutriScan is built for more than just reading labels—it's a specialized tool f
 - **👨‍👩‍👧‍👦 Family Nutrition:** Manage multiple family profiles to ensure kids get low-sugar snacks while seniors avoid high-sodium meals.
 
 ## ✨ Visual Preview
-![NutriScan Premium Dashboard](https://raw.githubusercontent.com/harshit-kumar-dev/nutriscan/main/frontend/public/login-hero.png)
+![NutriScan Premium Dashboard](https://raw.githubusercontent.com/harshit-kumar-dev/nutriscan/main/frontend/public/image.png)
 *Featuring our new high-contrast "Clinical Curator" Emerald Theme.*
 
 ---
