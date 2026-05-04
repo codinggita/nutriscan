@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Leaf, Sparkles, ArrowRight, X, ChevronRight, ShieldCheck, Flame, Candy, Milk, Activity, Wheat, Lightbulb, Salad } from 'lucide-react';
 
-// ── Nutrition bar ─────────────────────────────────────────────────────────────
+// Nutrition bar
 function NutriBar({ pct }) {
   const color = pct > 70 ? '#ef4444' : pct > 35 ? '#f59e0b' : '#10b981';
   return (
@@ -11,7 +11,7 @@ function NutriBar({ pct }) {
   );
 }
 
-// ── Macro row inside popup ────────────────────────────────────────────────────
+// Macro row inside popup
 function MacroRow({ label, value, sub, pct, Icon }) {
   return (
     <div style={{ marginBottom: 14 }}>
@@ -28,7 +28,7 @@ function MacroRow({ label, value, sub, pct, Icon }) {
   );
 }
 
-// ── Product Detail Popup ──────────────────────────────────────────────────────
+// Product Detail Popup
 function AlternativePopup({ alt, onClose }) {
   const p        = alt.per100g || {};
   const serving  = alt.serving_size_g || 100;
@@ -193,7 +193,7 @@ function AlternativePopup({ alt, onClose }) {
   );
 }
 
-// ── Alternatives list ──────────────────────────────────────────────────────────
+// Alternatives list
 export default function Alternatives({ alternatives }) {
   const [selected, setSelected] = useState(null);
 
@@ -201,7 +201,16 @@ export default function Alternatives({ alternatives }) {
 
   return (
     <>
-      <div className="mt-8 mb-4">
+      {/* Section Divider */}
+      <div className="flex items-center gap-4 mt-12 mb-10 w-full">
+        <div className="flex-1 border-t-[3px] border-gray-900"></div>
+        <span className="text-sm font-black text-white uppercase tracking-widest bg-gray-900 px-6 py-2 rounded-full shadow-[0_4px_0_0_rgba(17,24,39,0.2)]">
+          Better Choices
+        </span>
+        <div className="flex-1 border-t-[3px] border-gray-900"></div>
+      </div>
+
+      <div className="mb-4">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
             <Leaf size={20} className="text-emerald-600" />
