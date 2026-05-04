@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-// ── BMI helper ────────────────────────────────────────────────────────────────
+// BMI helper
 function calcBMI(heightCm, weightKg) {
   if (!heightCm || !weightKg) return null;
   const h = heightCm / 100;
@@ -16,7 +16,7 @@ function bmiCategory(bmi) {
   return 'Obese';
 }
 
-// ── Schema ────────────────────────────────────────────────────────────────────
+// Schema
 const userSchema = new mongoose.Schema({
   // Auth fields
   name:     { type: String, required: true, trim: true },
@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-// ── Pre-save hooks ────────────────────────────────────────────────────────────
+// Pre-save hooks
 userSchema.pre('save', async function () {
   // Hash password only when modified
   if (this.isModified('password')) {
@@ -53,12 +53,12 @@ userSchema.pre('save', async function () {
   }
 });
 
-// ── Instance method ───────────────────────────────────────────────────────────
+// Instance method
 userSchema.methods.comparePassword = async function (plain) {
   return bcrypt.compare(plain, this.password);
 };
 
-// ── Safe public projection ────────────────────────────────────────────────────
+// Safe public projection
 userSchema.methods.toPublic = function () {
   return {
     id:          this._id,

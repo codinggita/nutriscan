@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
 
-// ── Helper: sign a JWT ────────────────────────────────────────────────────────
+// Helper: sign a JWT
 function signToken(user) {
   return jwt.sign(
     {
@@ -16,7 +16,7 @@ function signToken(user) {
   );
 }
 
-// ── POST /api/users/register (signup) ─────────────────────────────────────────
+// POST /api/users/register (signup)
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, height, weight, ageGroup, conditions, sessionId } = req.body;
@@ -53,7 +53,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// ── POST /api/users/login ─────────────────────────────────────────────────────
+// POST /api/users/login
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -80,7 +80,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// ── GET /api/users/profile (me) ───────────────────────────────────────────────
+// GET /api/users/profile (me)
 export const getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -91,7 +91,7 @@ export const getUserProfile = async (req, res) => {
   }
 };
 
-// ── PATCH /api/users/profile (update) ─────────────────────────────────────────
+// PATCH /api/users/profile (update)
 export const updateUserProfile = async (req, res) => {
   try {
     const { name, password, height, weight, conditions, ageGroup, autoFlagHighSugar } = req.body;

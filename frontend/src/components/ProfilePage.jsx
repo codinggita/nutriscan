@@ -19,7 +19,7 @@ const COMMON_CONDITIONS = [
   { id: 'allergy', label: 'Allergies', Icon: AlertCircle },
 ];
 
-// ── BMI helpers ───────────────────────────────────────────────────────────────
+// BMI helpers
 function calcBMI(h, w) {
   if (!h || !w || h <= 0 || w <= 0) return null;
   const m = h / 100;
@@ -34,7 +34,7 @@ function bmiMeta(bmi) {
   return { cat: 'Obese', fill: '#ef4444', bg: '#fef2f2', text: '#991b1b', border: '#fecaca', Icon: XCircle, tip: 'High-sugar & calorie-dense items strongly flagged.' };
 }
 
-// ── Components ───────────────────────────────────────────────────────────────
+// Components
 
 function StatMini({ icon: Icon, label, val, unit, colorClass = "text-emerald-600", bgClass = "bg-emerald-50" }) {
   return (
@@ -54,11 +54,11 @@ function StatMini({ icon: Icon, label, val, unit, colorClass = "text-emerald-600
   );
 }
 
-// ── Watermelon UI Component ───────────────────────────────────────────────────
+// Watermelon UI Component
 // Watermelon UI is about sleek, beautifully animated Radix-like components.
 const WatermelonCard = ({ children, title }) => (
   <div className="relative group overflow-hidden rounded-[2rem] border border-pink-200/40 bg-gradient-to-br from-pink-50/50 to-emerald-50/50 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-md hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] transition-all duration-500">
-    {/* Animated background blobs */}
+    {/* Background blobs */}
     <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-pink-400/10 blur-3xl group-hover:bg-pink-400/20 transition-all duration-700"></div>
     <div className="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl group-hover:bg-emerald-400/20 transition-all duration-700"></div>
     <div className="relative z-10">
@@ -68,7 +68,7 @@ const WatermelonCard = ({ children, title }) => (
   </div>
 );
 
-// ── Main Component ────────────────────────────────────────────────────────────
+// Main Component
 export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout, onProfileUpdate, token }) {
   const [selectedAge, setSelectedAge] = useState(ageGroup);
   const [editing, setEditing] = useState(false);
@@ -115,6 +115,11 @@ export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout
   };
 
   const handleSave = async (updates = null) => {
+    // If handleSave is called from an onClick, 'updates' will be the React synthetic event.
+    // We ignore it so that it falls back to using the draft state.
+    if (updates && (updates.nativeEvent || updates.target || updates.type === 'click')) {
+      updates = null;
+    }
     const isDirectUpdate = updates !== null;
     if (!isDirectUpdate) {
       setSaving(true);
@@ -169,7 +174,7 @@ export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout
   return (
     <div className="max-w-6xl mx-auto pb-20 pt-6 px-4 md:px-8 font-sans bg-[#fbfbf9] min-h-[calc(100vh-80px)]">
       
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="flex items-center gap-6 mb-10">
         <div className="w-20 h-20 md:w-24 md:h-24 bg-gray-900 rounded-full flex items-center justify-center text-3xl md:text-4xl font-black text-white shadow-md relative flex-shrink-0">
           {(user?.name || 'U').charAt(0).toUpperCase()}
@@ -177,16 +182,15 @@ export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout
         <div>
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-1">
             <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight leading-none">{user?.name}</h1>
-            <span className="px-3 py-1 bg-amber-100 text-amber-800 text-[10px] font-black rounded-full uppercase tracking-widest w-fit">Gold Member</span>
           </div>
           <p className="text-xs md:text-sm font-medium text-gray-500">
-            Member since 2024 • {user?.email}
+            {user?.email}
           </p>
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 mb-6">
-        {/* ── Left Column: Stats & Progress ── */}
+        {/* Stats */}
         <div className="flex-1 bg-white rounded-[2rem] p-6 md:p-10 shadow-sm border border-gray-100 flex flex-col justify-center relative overflow-hidden">
           
           <div className="flex flex-col md:flex-row items-center gap-10 relative z-10 w-full">
@@ -210,7 +214,7 @@ export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout
           </div>
         </div>
 
-        {/* ── Right Column: Health Settings ── */}
+        {/* Settings */}
         <div className="w-full lg:w-[380px]">
           <WatermelonCard title="AI Health Settings">
             <div className="flex justify-between items-center mb-6">
@@ -258,7 +262,7 @@ export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout
                  <div className="flex items-center gap-2 text-sm font-bold text-gray-900">
                    <AlertTriangle size={16} className="text-amber-500" /> Auto-Flag High Sugar
                  </div>
-                 {/* Material UI Switch inside Watermelon UI Card */}
+                 {/* UI Switch */}
                  <Switch 
                    checked={!!user?.autoFlagHighSugar} 
                    onChange={handleToggleRisk} 
@@ -270,7 +274,7 @@ export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout
         </div>
       </div>
 
-      {/* ── Bottom Column: Account Management ── */}
+      {/* Account Settings */}
       <div className="bg-white rounded-[2rem] p-6 md:p-8 shadow-sm border border-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-start gap-8">
          <div className="flex-1 w-full lg:max-w-2xl">
            <h3 className="text-lg md:text-xl font-black text-gray-900 mb-6 tracking-tight">Account Management</h3>
@@ -318,7 +322,7 @@ export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout
          </div>
 
          <div className="shrink-0 flex items-end justify-start lg:justify-end mt-4 lg:mt-0">
-           {/* Material UI Button */}
+           {/* Button */}
            <Button 
              variant="outlined" 
              color="error" 
@@ -332,7 +336,7 @@ export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout
          </div>
       </div>
 
-      {/* ── MODAL: Health Edit ── */}
+      {/* Edit modal */}
       {editing && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-300">
           <div
@@ -347,7 +351,7 @@ export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout
             </div>
 
             <div className="space-y-8 mb-8">
-              {/* Profile Details */}
+              {/* User Data */}
               <div className="space-y-4">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Profile Details</label>
                 <TextField
@@ -378,7 +382,7 @@ export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout
                 <div style={{ flex: 1, height: '1px', background: '#f3f4f6' }} />
               </div>
 
-              {/* Health Stats */}
+              {/* BMI fields */}
               <div className="grid grid-cols-2 gap-6">
                 <TextField
                   label="Height (cm)"
@@ -402,7 +406,7 @@ export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout
                 />
               </div>
 
-              {/* Health Conditions */}
+              {/* Conditions */}
               <div className="space-y-4">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Medical History</label>
                 <div className="flex flex-wrap gap-3">
@@ -453,7 +457,7 @@ export default function ProfilePage({ user, ageGroup, onAgeGroupChange, onLogout
         </div>
       )}
 
-      {/* ── MODAL: Safety Terms ── */}
+      {/* Terms modal */}
       {showSafety && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-gray-900/60 backdrop-blur-md animate-in fade-in duration-300">
           <div className="w-full max-w-lg bg-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">

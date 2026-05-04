@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import LoginPage          from './components/LoginPage';
 import Scanner             from './components/Scanner';
 import NutritionCard       from './components/NutritionCard';
@@ -14,7 +14,7 @@ import ProductCard         from './components/ProductCard';
 import ManualEntry         from './components/ManualEntry';
 import { ScanLine, History, ArrowLeftRight, Search, Camera, User, Activity, AlertTriangle, X, ChevronRight, Edit3, Salad, Sparkles } from 'lucide-react';
 
-// ── Session ID (persisted in localStorage) ───────────────────────────────────
+// Session ID
 function getOrCreateSessionId() {
   let id = localStorage.getItem('sessionId');
   if (!id) {
@@ -28,7 +28,7 @@ const SESSION_ID  = getOrCreateSessionId();
 const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 const BACKEND_URL = baseUrl.replace(/\/+$/, '') + '/api';
 
-// ── Tab definitions ───────────────────────────────────────────────────────────
+// Tabs
 const TABS = [
   { id: 'scan',    Icon: ScanLine,       label: 'Scan'    },
   { id: 'history', Icon: History,        label: 'History' },
@@ -37,7 +37,7 @@ const TABS = [
 ];
 
 function App() {
-  // ── Auth state ──────────────────────────────────────────────────────────────
+  // Auth
   const [token,       setToken]       = useState(() => localStorage.getItem('sf_token') || null);
   const [authUser,    setAuthUser]    = useState(() => {
     try { return JSON.parse(localStorage.getItem('sf_user')) || null; } catch { return null; }
@@ -55,18 +55,19 @@ function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [isManualOpen, setIsManualOpen] = useState(false);
+  const searchAbortControllerRef = useRef(null);
 
-  // ── SEO Metadata ───────────────────────────────────────────────────────────
+  // SEO
   const getSEOMetadata = () => {
-    let title = "NutriScan AI | Intelligent Food Analysis";
+    let title = "NutriScan | Intelligent Food Analysis";
     let desc = "Instantly scan food labels to detect hidden risks, harmful additives, and nutritional insights tailored to your health profile.";
     
-    if (tab === 'history') title = "Scan History | NutriScan AI";
-    if (tab === 'compare') title = "Product Comparison | NutriScan AI";
-    if (tab === 'profile') title = "Your Profile | NutriScan AI";
+    if (tab === 'history') title = "Scan History | NutriScan";
+    if (tab === 'compare') title = "Product Comparison | NutriScan";
+    if (tab === 'profile') title = "Your Profile | NutriScan";
     
     if (screen === 'result' && product) {
-      title = `${product.name || 'Product'} Analysis | NutriScan AI`;
+      title = `${product.name || 'Product'} Analysis | NutriScan`;
       desc = `Deep dive into the ingredients and nutritional value of ${product.name}. Check for harmful additives and health risks.`;
     }
     
@@ -74,7 +75,7 @@ function App() {
   };
   const seo = getSEOMetadata();
 
-  // ── Auth handlers ───────────────────────────────────────────────────────────
+  // Auth logic
   const handleAuth = useCallback((newToken, user) => {
     setToken(newToken);
     setAuthUser(user);
@@ -92,7 +93,7 @@ function App() {
     setTab('scan');
   }, []);
 
-  // Called by ProfilePage after a successful PATCH /api/user/profile
+  // Profile update handler
   const handleProfileUpdate = useCallback((newToken, updatedUser) => {
     setToken(newToken);
     setAuthUser(updatedUser);
@@ -100,14 +101,14 @@ function App() {
     localStorage.setItem('sf_user',  JSON.stringify(updatedUser));
   }, []);
 
-  // ── Auth-aware fetch helper ─────────────────────────────────────────────────
+  // Fetch helper
   const authHeaders = useCallback(() => ({
     'Content-Type': 'application/json',
     'x-session-id': SESSION_ID,
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   }), [token]);
 
-  // ── Load featured products whenever token changes ─
+  // Fetch featured products
   React.useEffect(() => {
     if (!token) return; 
     fetch(`${BACKEND_URL}/scan/featured`, {
@@ -118,7 +119,7 @@ function App() {
       .catch(err => console.error('Featured fetch failed:', err));
   }, [token, authHeaders]);
 
-  // ── If not logged in → show LoginPage ──────────────────────────────────────
+  // Require login
   if (!token || !authUser) {
     return <LoginPage onAuth={handleAuth} />;
   }
@@ -185,6 +186,11 @@ function App() {
   const handleSearch = async (e) => {
     const q = e.target.value;
     setSearchQuery(q);
+
+    if (searchAbortControllerRef.current) {
+      searchAbortControllerRef.current.abort();
+    }
+
     if (q.length < 3) {
       setSearchResults([]);
       setSearching(false);
@@ -192,16 +198,24 @@ function App() {
     }
 
     setSearching(true);
+    const abortController = new AbortController();
+    searchAbortControllerRef.current = abortController;
+
     try {
       const res = await fetch(`${BACKEND_URL}/scan/search?q=${encodeURIComponent(q)}`, {
         headers: authHeaders(),
+        signal: abortController.signal
       });
       const data = await res.json();
       setSearchResults(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Search failed:', err);
-    } finally {
       setSearching(false);
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        // Ignored aborted fetches
+      } else {
+        console.error('Search failed:', err);
+        setSearching(false);
+      }
     }
   };
 
@@ -234,7 +248,7 @@ function App() {
   };
 
   return (
-    <div className="h-[100dvh] w-full bg-white font-sans flex flex-col overflow-hidden">
+    <div className="h-[100dvh] w-full bg-white font-sans flex flex-col md:flex-row overflow-hidden">
       <title>{seo.title}</title>
       <meta name="description" content={seo.desc} />
       <meta property="og:title" content={seo.title} />
@@ -243,23 +257,77 @@ function App() {
       <meta property="og:url" content="https://nutriscan-food.vercel.app/" />
       <meta property="og:image" content="https://nutriscan-food.vercel.app/logo.png" />
 
-      {/* ── Header ─────────────────────────────────────────────────────── */}
-      <header className="flex items-center justify-between px-5 md:px-10 pt-4 md:pt-5 pb-3 md:pb-4 border-b border-gray-100 flex-shrink-0 bg-white z-10 w-full">
-        <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-3">
-          {/* Brand */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white">
-              <ScanLine size={24} strokeWidth={2.5} />
-            </div>
-            <div>
-              <h1 className="text-xl font-black text-gray-900 leading-tight tracking-tight">
-                NutriScan <span className="text-emerald-500">AI</span>
-              </h1>
-              <p className="text-gray-400 text-[10px] font-bold tracking-widest uppercase">INTELLIGENT HEALTH AI</p>
-            </div>
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 h-full bg-[#f4f7f4] border-r border-emerald-900/10 flex-shrink-0 z-20">
+        <div className="p-8 flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm flex items-center justify-center bg-white">
+            <img src="/nutriscan-logo.png" alt="Logo" className="w-full h-full object-cover" />
           </div>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight">NutriScan</h1>
+        </div>
+        
+        <nav className="flex-1 px-5 flex flex-col pb-6">
+          <div className="space-y-2 flex-1">
+            {TABS.filter(t => t.id !== 'profile').map(({ id, Icon, label }) => {
+              const isActive = tab === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => { if (id === 'scan') reset(); setTab(id); }}
+                  className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all text-left ${isActive ? 'bg-[#2d7637] text-white shadow-[0_4px_12px_rgba(45,118,55,0.3)]' : 'text-gray-600 hover:bg-emerald-900/5 hover:text-gray-900'}`}
+                >
+                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                  <span className="text-sm tracking-wide">{id === 'scan' ? 'Dashboard' : label}</span>
+                </button>
+              );
+            })}
+          </div>
+          
+          <div className="mt-auto">
+            {TABS.filter(t => t.id === 'profile').map(({ id, Icon, label }) => {
+              const isActive = tab === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => { setTab(id); }}
+                  className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all text-left ${isActive ? 'bg-[#2d7637] text-white shadow-[0_4px_12px_rgba(45,118,55,0.3)]' : 'text-gray-600 hover:bg-emerald-900/5 hover:text-gray-900'}`}
+                >
+                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                  <span className="text-sm tracking-wide">{label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+      </aside>
 
-          {/* Greeting chip */}
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-white">
+        {/* Header */}
+        <header className="flex items-center justify-between px-5 md:px-10 pt-4 md:pt-8 pb-3 md:pb-6 border-b border-gray-100 flex-shrink-0 bg-white z-10 w-full">
+          <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-3">
+            {/* Mobile Brand (Hidden on Desktop) */}
+            <div className="flex md:hidden items-center gap-3">
+              <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm flex items-center justify-center bg-white">
+                <img src="/nutriscan-logo.png" alt="Logo" className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <h1 className="text-xl font-black text-gray-900 leading-tight tracking-tight">
+                  NutriScan
+                </h1>
+                <p className="text-gray-400 text-[10px] font-bold tracking-widest uppercase">INTELLIGENT HEALTH AI</p>
+              </div>
+            </div>
+
+            {/* Desktop Page Title */}
+            <div className="hidden md:block">
+               <h2 className="text-2xl md:text-3xl font-black text-[#1e5c26] tracking-tight mb-1">
+                 {tab === 'scan' && screen === 'scan' ? 'Health Overview' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+               </h2>
+               <p className="text-gray-500 text-sm font-medium">Your nutritional analysis & insights</p>
+            </div>
+
+            {/* Greeting chip */}
           <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5">
             <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[11px] font-black flex-shrink-0">
               {(authUser.name || 'U').charAt(0).toUpperCase()}
@@ -278,18 +346,18 @@ function App() {
         </div>
       </header>
 
-      {/* ── Main Content ────────────────────────────────────────────────── */}
+      {/* Main Content */}
       <main className="flex-1 overflow-y-auto w-full">
         <div className="w-full max-w-7xl mx-auto px-5 md:px-10 pt-5 pb-10">
 
-        {/* ════ SCAN TAB ════ */}
+        {/* SCAN TAB */}
         {tab === 'scan' && (
           <>
             {screen === 'scan' && (
               <div className="flex flex-col animate-in pb-10">
                 {!isScanning ? (
                   <>
-                    {/* ── TOP SEARCH BAR ── */}
+                    {/* Search bar */}
                     <div className="w-full max-w-4xl mx-auto mb-8 relative z-50">
                        <div className="relative group">
                           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
@@ -307,7 +375,7 @@ function App() {
                           )}
                        </div>
 
-                       {/* Search Results Dropdown */}
+                       {/* Search results */}
                        {(searchResults.length > 0 || searching) && (
                           <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                              <div className="max-h-80 overflow-y-auto p-2">
@@ -348,7 +416,7 @@ function App() {
                        )}
                     </div>
 
-                    {/* ── HERO SECTION ── */}
+                    {/* Hero */}
                     <div className="relative mb-8 mt-2 md:mt-6 w-full max-w-2xl mx-auto">
                        <div className="relative bg-white rounded-[2.5rem] p-6 md:p-10 text-center border-2 border-gray-900 shadow-[0_6px_0_0_#111827] overflow-hidden flex flex-col items-center">
                          
@@ -388,7 +456,7 @@ function App() {
                        </div>
                     </div>
 
-                    {/* ── EXPLORE GRID ── */}
+                    {/* Explore */}
                     <div className="flex items-center justify-between mb-6 px-1">
                        <div>
                          <h3 className="text-xl font-black text-gray-900 tracking-tight">Explore Snacks</h3>
@@ -511,7 +579,8 @@ function App() {
         </div>
       </main>
 
-      <nav className="shrink-0 w-full bg-white/95 backdrop-blur-xl border-t border-gray-100 z-40 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
+      {/* Bottom Nav (Mobile Only) */}
+      <nav className="md:hidden shrink-0 w-full bg-white/95 backdrop-blur-xl border-t border-gray-100 z-40 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
         <div className="flex items-stretch w-full max-w-lg mx-auto">
         {TABS.map(({ id, Icon, label }) => {
           const isActive = tab === id;
@@ -539,6 +608,7 @@ function App() {
         onClose={() => setIsManualOpen(false)} 
         onAnalyze={handleManualAnalyze} 
       />
+      </div>
     </div>
   );
 }
