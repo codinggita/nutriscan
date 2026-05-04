@@ -11,7 +11,7 @@ const staticAlternatives = JSON.parse(
   fs.readFileSync(path.join(__dirname, '../data/alternatives.json'), 'utf8')
 );
 
-// ── Check for empty/missing nutrition data ────────────────────────────────────
+// Check for empty/missing nutrition data
 function isFalsyData(per100g) {
   if (!per100g) return true;
   const sugar   = per100g.sugar_g       || 0;
@@ -25,7 +25,7 @@ function isFalsyData(per100g) {
   return (sugar === 0 && fat === 0 && sodium === 0 && fiber === 0 && protein === 0 && calories === 0);
 }
 
-// ── Nutrition score — lower is better ────────────────────────────────────────
+// Nutrition score — lower is better
 function nutritionScore(per100g) {
   const sugar   = per100g.sugar_g       || 0;
   const fat     = per100g.fat_g         || 0;
@@ -35,7 +35,7 @@ function nutritionScore(per100g) {
   return (sugar * 0.40) + (fat * 0.30) + (sodium * 0.01) - (fiber * 0.50) - (protein * 0.30);
 }
 
-// ── Category keywords map ─────────────────────────────────────────────────────
+// Category keywords map
 const CATEGORY_KEYWORDS = [
   { category: 'chocolate',  keywords: ['chocolate', 'choco', 'cocoa', 'cadbury', 'dairy milk', 'kitkat', 'kit kat', 'fuse', 'munch', 'bounty', 'truffle'] },
   { category: 'biscuit',    keywords: ['biscuit', 'cookie', 'cookies', 'hide & seek', 'hide and seek', 'bourbon', 'oreo', 'parle', 'marie', 'digestive', 'cracker', 'milano'] },
@@ -72,7 +72,7 @@ function keywordsForCategory(category) {
   return match ? match.keywords : [];
 }
 
-// ── Main export ───────────────────────────────────────────────────────────────
+// Main export
 export const getAlternatives = async (product, riskLevel, count = 3) => {
   const originalScore = nutritionScore(product.per100g);
   const category      = detectCategory(product.name);
@@ -91,7 +91,7 @@ export const getAlternatives = async (product, riskLevel, count = 3) => {
       // Filter out same products AND products with falsy (all 0s) data
       const eligible = allProducts.filter(p => !sameProductIds.has(p._id?.toString()) && !isFalsyData(p.per100g));
 
-      // ── Step 1: same-category products with better nutrition score ──────────
+      // Step 1: same-category products with better nutrition score
       if (category) {
         const catKeywords = keywordsForCategory(category);
         const sameCat = eligible.filter(p => {
@@ -105,7 +105,7 @@ export const getAlternatives = async (product, riskLevel, count = 3) => {
           .slice(0, count);
       }
 
-      // ── Step 2: if not enough same-category hits, fill with any better product
+      // Step 2: if not enough same-category hits, fill with any better product
       if (candidates.length < count) {
         const candidateIds = new Set(candidates.map(c => c._id?.toString()));
         const extra = eligible
@@ -120,7 +120,7 @@ export const getAlternatives = async (product, riskLevel, count = 3) => {
     console.error('DB alternatives error (non-fatal):', err.message);
   }
 
-  // ── Step 3: pad with static fallback (category-aware) ─────────────────────
+  // Step 3: pad with static fallback (category-aware)
   if (candidates.length < count) {
     // First try the _category_hints block from JSON for exact category match
     const categoryHints = category && staticAlternatives._category_hints

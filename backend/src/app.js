@@ -23,7 +23,7 @@ app.use('/api/history', historyRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => res.json({ 
-  message: 'NutriScan AI API is running', 
+  message: 'NutriScan API is running', 
   docs: '/health' 
 }));
 

@@ -1,7 +1,7 @@
 {
   "name": "nutriscan-backend",
   "version": "1.0.0",
-  "description": "Backend for NutriScan AI",
+  "description": "Backend for NutriScan",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
