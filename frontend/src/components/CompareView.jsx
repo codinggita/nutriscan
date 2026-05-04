@@ -1,5 +1,24 @@
-import React, { useState } from 'react';
-import { ArrowLeftRight, Trophy, Zap, Search, HelpCircle, AlertCircle, Info, ChevronRight, BarChart3 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { ArrowLeftRight, Trophy, Zap, Search, HelpCircle, AlertCircle, Info, ChevronRight, BarChart3, CheckCircle } from 'lucide-react';
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Radar } from 'react-chartjs-2';
+
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+);
 
 const NUTRI_COLOR = { A: '#038141', B: '#85BB2F', C: '#FECB02', D: '#EE8100', E: '#E63E11' };
 
@@ -63,6 +82,8 @@ export default function CompareView({ sessionId, backendUrl, ageGroup }) {
   const [results2, setResults2] = useState([]);
   const [searching1, setSearching1] = useState(false);
   const [searching2, setSearching2] = useState(false);
+  const searchAbortController1Ref = useRef(null);
+  const searchAbortController2Ref = useRef(null);
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -72,8 +93,14 @@ export default function CompareView({ sessionId, backendUrl, ageGroup }) {
     const setQuery = idx === 1 ? setSearchQuery1 : setSearchQuery2;
     const setResults = idx === 1 ? setResults1 : setResults2;
     const setSearching = idx === 1 ? setSearching1 : setSearching2;
+    const abortControllerRef = idx === 1 ? searchAbortController1Ref : searchAbortController2Ref;
 
     setQuery(q);
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
     if (q.length < 3) {
       setResults([]);
       setSearching(false);
@@ -81,16 +108,24 @@ export default function CompareView({ sessionId, backendUrl, ageGroup }) {
     }
 
     setSearching(true);
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
     try {
       const res = await fetch(`${backendUrl}/scan/search?q=${encodeURIComponent(q)}`, {
-        headers: { 'x-session-id': sessionId }
+        headers: { 'x-session-id': sessionId },
+        signal: abortController.signal
       });
       const data = await res.json();
       setResults(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Search failed:', err);
-    } finally {
       setSearching(false);
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        // Ignored aborted fetches
+      } else {
+        console.error('Search failed:', err);
+        setSearching(false);
+      }
     }
   };
 
@@ -141,7 +176,7 @@ export default function CompareView({ sessionId, backendUrl, ageGroup }) {
   return (
     <div className="max-w-6xl mx-auto pb-20">
 
-      {/* ── HEADER ── */}
+      {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -181,7 +216,7 @@ export default function CompareView({ sessionId, backendUrl, ageGroup }) {
         </div>
       </div>
 
-      {/* ── INPUT SECTION ── */}
+      {/* INPUT SECTION */}
       {!result && (
         <div className="bg-white border-4 border-gray-900 rounded-[2.5rem] p-6 md:p-8 mb-8 animate-in fade-in duration-500">
           <div className="flex flex-col md:flex-row items-center gap-6">
@@ -258,7 +293,7 @@ export default function CompareView({ sessionId, backendUrl, ageGroup }) {
 
       {error && <div className="mt-8 bg-red-50 border-2 border-red-500 text-red-500 rounded-3xl p-6 text-sm font-black text-center shadow-xl shadow-red-100">{error}</div>}
 
-      {/* ── RESULTS ── */}
+      {/* RESULTS */}
       {result && (
         <div className="animate-in slide-in-from-bottom-10 duration-700">
 
@@ -298,6 +333,69 @@ export default function CompareView({ sessionId, backendUrl, ageGroup }) {
             })}
           </div>
 
+          {/* Nutritional Blueprint */}
+          <div className="bg-[#f8faf8] border border-gray-200 rounded-[2.5rem] p-8 mb-12 relative overflow-hidden shadow-sm">
+            <h4 className="text-2xl font-black text-gray-900 mb-8">Nutritional Blueprint</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-center">
+              {[
+                { pk: 'product1', color: 'rgba(239, 68, 68, 0.4)', borderColor: '#ef4444' }, // Red for P1 (usually the loser in this demo)
+                { pk: 'product2', color: 'rgba(16, 185, 129, 0.4)', borderColor: '#10b981' } // Green for P2
+              ].map(({ pk, color, borderColor }) => {
+                const isWinner = result.overallWinner === pk;
+                const d = result.comparison || {};
+                
+                // Normalizing values just for shape display
+                const safeVal = (k) => d[k]?.[pk] || 0;
+                const dataPoints = [
+                  Math.min((safeVal('protein_g') / 15) * 100, 100),
+                  Math.min((safeVal('calories_kcal') / 400) * 100, 100),
+                  Math.min((safeVal('sugar_g') / 25) * 100, 100),
+                  Math.min((safeVal('sodium_mg') / 800) * 100, 100),
+                  Math.min((safeVal('fat_g') / 30) * 100, 100)
+                ];
+
+                const chartData = {
+                  labels: ['PROTEIN', 'CALORIES', 'SUGAR', 'SODIUM', 'FAT'],
+                  datasets: [{
+                    data: dataPoints,
+                    backgroundColor: isWinner ? 'rgba(133, 187, 47, 0.6)' : 'rgba(230, 62, 17, 0.4)',
+                    borderColor: isWinner ? '#85BB2F' : '#E63E11',
+                    borderWidth: 2,
+                    pointBackgroundColor: isWinner ? '#85BB2F' : '#E63E11',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: isWinner ? '#85BB2F' : '#E63E11',
+                  }]
+                };
+
+                const radarOptions = {
+                  scales: {
+                    r: {
+                      min: 0, max: 100,
+                      ticks: { display: false },
+                      pointLabels: { font: { size: 10, weight: 'bold' }, color: '#4b5563' },
+                      grid: { color: '#e5e7eb' },
+                      angleLines: { color: '#e5e7eb' },
+                    }
+                  },
+                  plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                  maintainAspectRatio: false,
+                };
+
+                return (
+                  <div key={pk} className="flex flex-col items-center">
+                    <div className="w-full h-56 md:h-64 mb-4 relative">
+                      <Radar data={chartData} options={radarOptions} />
+                    </div>
+                    <p className={`text-base font-black ${isWinner ? 'text-[#1e7131]' : 'text-gray-600'}`}>
+                      {result[pk].name}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Detailed Stats Card */}
           <div className="bg-white border-4 border-gray-900 rounded-[2.5rem] overflow-hidden mb-12">
             <div className="bg-gray-50 border-b-2 border-gray-100 p-8 flex items-center justify-between">
@@ -323,23 +421,25 @@ export default function CompareView({ sessionId, backendUrl, ageGroup }) {
             </div>
           </div>
 
-          {/* AI Verdict Card */}
-          {result.verdict && (
-            <div className="bg-emerald-600 rounded-[2.5rem] p-10 text-white relative overflow-hidden border-4 border-white">
-              <div className="absolute right-0 top-0 p-12 opacity-10 rotate-12">
-                <Zap size={160} fill="white" />
+          {/* Clinical Curator's Choice */}
+          {result.overallWinner && (
+            <div className="bg-[#246b33] rounded-[2rem] p-8 md:p-10 text-white relative overflow-hidden shadow-xl mb-12 border border-[#1d5829]">
+              <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-12 translate-y-12">
+                <CheckCircle size={220} fill="white" className="text-[#246b33]" />
               </div>
               <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-md">
-                    <Zap size={20} className="text-white" fill="white" />
+                <div className="flex items-center gap-2 mb-8">
+                  <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                    <CheckCircle size={14} className="text-[#246b33]" strokeWidth={3} />
                   </div>
-                  <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-100">Deep AI Verdict</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-[0.15em] text-emerald-50">Clinical Curator's Choice</h4>
                 </div>
-                <p className="text-2xl font-black leading-tight tracking-tight max-w-4xl">{result.verdict}</p>
-                <div className="mt-8 flex items-center gap-2 text-emerald-200 text-[10px] font-black uppercase tracking-widest">
-                  <Info size={14} /> Based on complex nutritional scoring & user health profile
-                </div>
+                <h2 className="text-4xl md:text-5xl font-black leading-tight tracking-tight mb-6 max-w-2xl">
+                  {result[result.overallWinner].name}
+                </h2>
+                <p className="text-emerald-50 text-base md:text-lg leading-relaxed max-w-3xl font-medium">
+                  {result.verdict}
+                </p>
               </div>
             </div>
           )}
